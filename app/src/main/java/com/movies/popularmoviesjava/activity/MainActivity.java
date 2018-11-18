@@ -13,6 +13,7 @@ import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.MovieList;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
+import com.movies.popularmoviesjava.utilities.ApiKey;
 
 import java.util.ArrayList;
 
