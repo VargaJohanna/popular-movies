@@ -5,10 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.MovieList;
+import com.movies.popularmoviesjava.network.RetrofitInstance;
+import com.movies.popularmoviesjava.utilities.ImageSize;
+import com.squareup.picasso.Picasso;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -30,7 +34,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(@NonNull MovieAdapterViewHolder holder, int position) {
-        holder.posterTextView.setText(movieList.get(position).getPosterPath());
+        Picasso.get()
+                .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.imageSize.get(3) + movieList.get(position).getPosterPath())
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(holder.posterView);
     }
 
     @Override
@@ -38,12 +45,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         return movieList.size();
     }
 
-    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder {
-        private final TextView posterTextView;
+    class MovieAdapterViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView posterView;
 
-        public MovieAdapterViewHolder(View itemView) {
+        MovieAdapterViewHolder(View itemView) {
             super(itemView);
-            posterTextView = (TextView) itemView.findViewById(R.id.movie_image_path);
+            posterView = itemView.findViewById(R.id.movieImage);
         }
     }
 }

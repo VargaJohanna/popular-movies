@@ -2,9 +2,12 @@ package com.movies.popularmoviesjava.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
@@ -14,6 +17,7 @@ import com.movies.popularmoviesjava.model.MovieList;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
 import com.movies.popularmoviesjava.utilities.ApiKey;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -24,6 +28,15 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private MovieAdapter adapter;
     private RecyclerView recyclerView;
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
     private String sortBy = "popular";
 
     @Override
@@ -31,9 +44,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        createMovieList();
+    }
+
+    private void createMovieList() {
         GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
 
-        Call<MovieList> call = service.getMovieData(sortBy, ApiKey.KEY);
+        Call<MovieList> call = service.getMovieData(getSortBy(), ApiKey.KEY);
         Log.d("URL called", call.request().url().toString());
 
 
@@ -53,8 +70,26 @@ public class MainActivity extends AppCompatActivity {
     private void generateMovieList(ArrayList<Movie> movieData) {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         adapter = new MovieAdapter(movieData);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if(itemId == R.id.most_popular) {
+            setSortBy("popular");
+        } else {
+            setSortBy("top_rated");
+        }
+        createMovieList();
+        return true;
     }
 }
