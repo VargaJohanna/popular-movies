@@ -11,8 +11,4 @@ public class MovieList {
     public ArrayList<Movie> getMovieList() {
         return movieList;
     }
-
-    public void setMovieList(ArrayList<Movie> movieList) {
-        this.movieList = movieList;
-    }
 }

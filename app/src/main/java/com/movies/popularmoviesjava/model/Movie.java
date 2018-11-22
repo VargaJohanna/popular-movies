@@ -18,10 +18,6 @@ public class Movie {
     @SerializedName("release_date")
     private String releaseDate;
 
-//    public Movie (String posterPath) {
-//        this.posterPath = posterPath;
-//    }
-
     public String getPosterPath() {
         return posterPath;
     }
