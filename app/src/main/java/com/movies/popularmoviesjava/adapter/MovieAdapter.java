@@ -24,6 +24,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         this.movieList = movieList;
         this.itemClickListener = itemClickListener;
     }
+
     @NonNull
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,7 +36,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(@NonNull MovieAdapterViewHolder holder, int position) {
         Picasso.get()
-                .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.imageSize.get(3) + movieList.get(position).getPosterPath())
+                .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.getImageSize(3) + movieList.get(position).getPosterPath())
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(holder.posterView);
     }
@@ -56,11 +57,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         @Override
         public void onClick(View v) {
-            itemClickListener.onItemClick(getAdapterPosition());
+            itemClickListener.onItemClick(movieList.get(getAdapterPosition()));
         }
     }
 
     public interface ItemClickListener {
-        void onItemClick(int clickedItem);
+        void onItemClick(Movie movie);
     }
 }

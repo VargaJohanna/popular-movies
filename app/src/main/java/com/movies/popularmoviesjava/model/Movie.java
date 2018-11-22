@@ -6,15 +6,39 @@ public class Movie {
     @SerializedName("poster_path")
     private String posterPath;
 
-    public Movie (String posterPath) {
-        this.posterPath = posterPath;
-    }
+    @SerializedName("vote_average")
+    private String userRating;
+
+    @SerializedName("original_title")
+    private String title;
+
+    @SerializedName("overview")
+    private String synopsis;
+
+    @SerializedName("release_date")
+    private String releaseDate;
+
+//    public Movie (String posterPath) {
+//        this.posterPath = posterPath;
+//    }
 
     public String getPosterPath() {
         return posterPath;
     }
 
-    public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
+    public String getUserRating() {
+        return userRating;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getSynopsis() {
+        return synopsis;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
     }
 }

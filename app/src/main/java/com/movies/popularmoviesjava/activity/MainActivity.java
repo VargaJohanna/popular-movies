@@ -1,5 +1,6 @@
 package com.movies.popularmoviesjava.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -92,7 +93,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     @Override
-    public void onItemClick(int clickedItem) {
-        Toast.makeText(this, "Clicked on item: " + clickedItem, Toast.LENGTH_SHORT).show();
+    public void onItemClick(Movie movie) {
+        Intent detailActivity = new Intent(this, DetailActivity.class);
+        detailActivity.putExtra(DetailActivity.TITLE, movie.getTitle());
+        detailActivity.putExtra(DetailActivity.IMAGE_PATH, movie.getPosterPath());
+        detailActivity.putExtra(DetailActivity.RELEASE_DATE, movie.getReleaseDate());
+        detailActivity.putExtra(DetailActivity.SYNOPSIS, movie.getSynopsis());
+        detailActivity.putExtra(DetailActivity.USER_RATING, movie.getUserRating());
+        startActivity(detailActivity);
     }
 }
