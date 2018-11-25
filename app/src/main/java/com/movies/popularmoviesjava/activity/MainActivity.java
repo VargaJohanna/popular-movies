@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private void generateMovieList(ArrayList<Movie> movieData) {
         recyclerView = findViewById(R.id.recycler_view);
         adapter = new MovieAdapter(movieData, this);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 3);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }
