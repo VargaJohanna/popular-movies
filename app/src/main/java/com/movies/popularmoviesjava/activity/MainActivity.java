@@ -5,9 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
@@ -27,6 +28,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
     private MovieAdapter adapter;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
 
     public String getSortBy() {
         return sortBy;
@@ -47,20 +49,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void createMovieList() {
+        progressBar = findViewById(R.id.progress_bar);
         GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
-
         Call<MovieList> call = service.getMovieData(getSortBy(), ApiKey.KEY);
-        Log.d("URL called", call.request().url().toString());
-
+        progressBar.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<MovieList>() {
             @Override
             public void onResponse(Call<MovieList> call, Response<MovieList> response) {
                 generateMovieList(response.body().getMovieList());
+                progressBar.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<MovieList> call, Throwable t) {
+                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(MainActivity.this, "Something went wrong...", Toast.LENGTH_LONG).show();
             }
         });
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private void generateMovieList(ArrayList<Movie> movieData) {
         recyclerView = findViewById(R.id.recycler_view);
         adapter = new MovieAdapter(movieData, this);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 3);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }

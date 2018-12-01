@@ -36,8 +36,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(@NonNull MovieAdapterViewHolder holder, int position) {
         Picasso.get()
-                .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.getImageSize(3) + movieList.get(position).getPosterPath())
-                .placeholder(R.drawable.ic_launcher_background)
+                .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.getImageSize(2) + movieList.get(position).getPosterPath())
                 .into(holder.posterView);
     }
 
