@@ -29,28 +29,29 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private MovieAdapter adapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private String sortBy = "popular";
+    private static final String SORT_BY_KEY = "SORT_BY";
 
     public String getSortBy() {
         return sortBy;
     }
-
     public void setSortBy(String sortBy) {
         this.sortBy = sortBy;
     }
-
-    private String sortBy = "popular";
+    private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        createMovieList();
+        progressBar = findViewById(R.id.progress_bar);
+        if (savedInstanceState!= null){
+            setSortBy(savedInstanceState.getString(SORT_BY_KEY));
+        }
+        createMovieList(service);
     }
 
-    private void createMovieList() {
-        progressBar = findViewById(R.id.progress_bar);
-        GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
+    private void createMovieList(GetMovieDataService service) {
         Call<MovieList> call = service.getMovieData(getSortBy(), ApiKey.KEY);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -63,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
             @Override
             public void onFailure(Call<MovieList> call, Throwable t) {
-                progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(MainActivity.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         } else {
             setSortBy("top_rated");
         }
-        createMovieList();
+        createMovieList(service);
         return true;
     }
 
@@ -104,5 +105,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         detailActivity.putExtra(DetailActivity.SYNOPSIS, movie.getSynopsis());
         detailActivity.putExtra(DetailActivity.USER_RATING, movie.getUserRating());
         startActivity(detailActivity);
+    }
+
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(SORT_BY_KEY, getSortBy());
     }
 }
