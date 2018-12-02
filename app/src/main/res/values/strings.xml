@@ -8,4 +8,6 @@
     <string name="placeholder">Placeholder</string>
     <string name="released_label">Released:</string>
     <string name="rating_label">Rating:</string>
+    <string name="popular_sort_by">popular</string>
+    <string name="top_rated_sort_by">top_rated</string>
 </resources>

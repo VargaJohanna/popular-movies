@@ -88,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.most_popular) {
-            setSortBy("popular");
+            setSortBy(getString(R.string.popular_sort_by));
         } else {
-            setSortBy("top_rated");
+            setSortBy(getString(R.string.top_rated_sort_by));
         }
         createMovieList(service);
         return true;
@@ -99,11 +99,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     @Override
     public void onItemClick(Movie movie) {
         Intent detailActivity = new Intent(this, DetailActivity.class);
-        detailActivity.putExtra(DetailActivity.TITLE, movie.getTitle());
-        detailActivity.putExtra(DetailActivity.IMAGE_PATH, movie.getPosterPath());
-        detailActivity.putExtra(DetailActivity.RELEASE_DATE, movie.getReleaseDate());
-        detailActivity.putExtra(DetailActivity.SYNOPSIS, movie.getSynopsis());
-        detailActivity.putExtra(DetailActivity.USER_RATING, movie.getUserRating());
+        detailActivity.putExtra(DetailActivity.MOVIE_OBJECT, movie);
         startActivity(detailActivity);
     }
 
