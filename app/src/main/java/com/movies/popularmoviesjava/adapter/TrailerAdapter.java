@@ -8,18 +8,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.movies.popularmoviesjava.R;
-import com.movies.popularmoviesjava.activity.DetailActivity;
 import com.movies.popularmoviesjava.model.TrailerVideo;
-import com.movies.popularmoviesjava.model.TrailersList;
 
 import java.util.ArrayList;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
     private ArrayList<TrailerVideo> trailerList;
+    final private ItemClickListener itemClickListener;
 
-    public TrailerAdapter(ArrayList<TrailerVideo> trailerList) {
+
+    public TrailerAdapter(ArrayList<TrailerVideo> trailerList, ItemClickListener itemClickListener) {
         this.trailerList = trailerList;
-
+        this.itemClickListener = itemClickListener;
     }
     @NonNull
     @Override
@@ -39,12 +39,23 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         return trailerList.size();
     }
 
-    class TrailerAdapterViewHolder extends RecyclerView.ViewHolder {
+    class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         final TextView trailerTitle;
 
         TrailerAdapterViewHolder(View itemView) {
             super(itemView);
             trailerTitle = itemView.findViewById(R.id.row_trailer_title);
+            itemView.setOnClickListener(this);
         }
+
+
+        @Override
+        public void onClick(View v) {
+            itemClickListener.onItemClick(trailerList.get(getAdapterPosition()));
+        }
+    }
+
+    public interface ItemClickListener {
+        void onItemClick(TrailerVideo video);
     }
 }

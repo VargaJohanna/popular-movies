@@ -1,6 +1,7 @@
 package com.movies.popularmoviesjava.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
 import com.movies.popularmoviesjava.utilities.ApiKey;
 import com.movies.popularmoviesjava.utilities.ImageSize;
+import com.movies.popularmoviesjava.utilities.TrailerUrl;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener {
     public static final String MOVIE_OBJECT = "movie";
     Intent intent;
     TextView movieTitle;
@@ -92,7 +94,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void generateTrailerList(ArrayList<TrailerVideo> trailers) {
         recyclerView = findViewById(R.id.recycler_view_trailer);
-        trailerAdapter = new TrailerAdapter(trailers);
+        trailerAdapter = new TrailerAdapter(trailers, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(trailerAdapter);
@@ -112,5 +114,19 @@ public class DetailActivity extends AppCompatActivity {
 
     private String getVideoId() {
         return movie.getFilmId();
+    }
+
+    private String getTrailerId(TrailerVideo video) {
+        return video.getVideoKey();
+    }
+
+    @Override
+    public void onItemClick(TrailerVideo video) {
+        Uri trailerUri = Uri.parse(TrailerUrl.URL + getTrailerId(video));
+        Intent intent = new Intent(Intent.ACTION_VIEW, trailerUri);
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+            startActivity(intent);
+        }
     }
 }
