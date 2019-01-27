@@ -21,12 +21,16 @@ public class Movie implements Parcelable {
     @SerializedName("release_date")
     private String releaseDate;
 
-    protected Movie(Parcel in) {
+    @SerializedName("id")
+    private String filmId;
+
+    private Movie(Parcel in) {
         posterPath = in.readString();
         userRating = in.readString();
         title = in.readString();
         synopsis = in.readString();
         releaseDate = in.readString();
+        filmId = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -61,6 +65,10 @@ public class Movie implements Parcelable {
         return releaseDate;
     }
 
+    public String getFilmId() {
+        return filmId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -73,5 +81,6 @@ public class Movie implements Parcelable {
         dest.writeString(title);
         dest.writeString(synopsis);
         dest.writeString(releaseDate);
+        dest.writeString(filmId);
     }
 }

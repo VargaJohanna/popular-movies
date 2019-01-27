@@ -23,17 +23,18 @@
         <ImageView
             android:id="@+id/thumbnail_image"
             android:layout_gravity="center"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
+            android:src="@drawable/tape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/release_date"
             android:textSize="16sp"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             android:text="@string/release_date_placeholder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -42,8 +43,8 @@
             android:id="@+id/user_rating"
             android:text="@string/user_rating_placeholder"
             android:textSize="16sp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -52,8 +53,42 @@
             android:layout_width="match_parent"
             android:text="@string/placeholder"
             android:textSize="16sp"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
             android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="16dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="100sp"
+            android:background="#848484" />
+
+        <TextView
+            android:text="@string/trailers_list_title"
+            android:textSize="16sp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_trailer"
+            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar_details"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:foregroundGravity="center"
+            android:visibility="invisible"/>
 
     </LinearLayout>
 </ScrollView>

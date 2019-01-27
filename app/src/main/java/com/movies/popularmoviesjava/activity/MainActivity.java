@@ -2,6 +2,7 @@ package com.movies.popularmoviesjava.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -57,7 +58,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         call.enqueue(new Callback<MovieList>() {
             @Override
-            public void onResponse(Call<MovieList> call, Response<MovieList> response) {
+            public void onResponse(@NonNull Call<MovieList> call, @NonNull Response<MovieList> response) {
+                assert response.body() != null;
                 generateMovieList(response.body().getMovieList());
                 progressBar.setVisibility(View.INVISIBLE);
             }
