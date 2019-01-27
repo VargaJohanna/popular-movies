@@ -1,6 +1,7 @@
 package com.movies.popularmoviesjava.activity;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -39,10 +41,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     TextView releaseDate;
     TextView userRating;
     TextView synopsis;
+    ImageView favouriteButton;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private TrailerAdapter trailerAdapter;
     private Movie movie;
+    public boolean addedToFavourite = false;
 
     private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
 
@@ -57,6 +61,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         userRating = findViewById(R.id.user_rating);
         synopsis = findViewById(R.id.synopsis);
         progressBar = findViewById(R.id.progress_bar_details);
+        favouriteButton = findViewById(R.id.favourite_icon);
+        updateFavouriteButton();
 
 
         if(intent.hasExtra(MOVIE_OBJECT)) {
@@ -128,5 +134,20 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             intent.addCategory(Intent.CATEGORY_BROWSABLE);
             startActivity(intent);
         }
+    }
+
+    public void updateFavouriteButton() {
+        favouriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!addedToFavourite) {
+                    favouriteButton.setImageResource(R.drawable.star_small_yellow);
+                    addedToFavourite = true;
+                } else  {
+                    favouriteButton.setImageResource(R.drawable.star_small);
+                    addedToFavourite = false;
+                }
+            }
+        });
     }
 }

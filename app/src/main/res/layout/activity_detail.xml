@@ -21,6 +21,13 @@
             android:layout_height="wrap_content" />
 
         <ImageView
+            android:id="@+id/favourite_icon"
+            android:src="@drawable/star_small"
+            android:layout_gravity="center"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+        <ImageView
             android:id="@+id/thumbnail_image"
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
