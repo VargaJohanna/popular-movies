@@ -1,11 +1,15 @@
 package com.movies.popularmoviesjava.activity;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +18,9 @@ import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.MovieAdapter;
+import com.movies.popularmoviesjava.database.AppDatabase;
+import com.movies.popularmoviesjava.database.FavouriteMoviesViewModal;
+import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.MovieList;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
@@ -21,6 +28,7 @@ import com.movies.popularmoviesjava.network.RetrofitInstance;
 import com.movies.popularmoviesjava.utilities.ApiKey;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private ProgressBar progressBar;
     private String sortBy = "popular";
     private static final String SORT_BY_KEY = "SORT_BY";
+    private AppDatabase mDb;
 
     public String getSortBy() {
         return sortBy;
@@ -50,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             setSortBy(savedInstanceState.getString(SORT_BY_KEY));
         }
         createMovieList(service);
+        mDb = AppDatabase.getInstance(getApplicationContext());
     }
 
     private void createMovieList(GetMovieDataService service) {
@@ -72,7 +82,34 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         });
     }
 
-    private void generateMovieList(ArrayList<Movie> movieData) {
+    private void createFavouriteMovieList(){
+        FavouriteMoviesViewModal viewModal = ViewModelProviders.of(this).get(FavouriteMoviesViewModal.class);
+        viewModal.getFavouriteMovies().observe(this, new Observer<List<MovieEntry>>() {
+                    @Override
+                    public void onChanged(@Nullable List<MovieEntry> movieEntries) {
+                        Log.d(MainActivity.class.getSimpleName(), "Updating list from LiveData in ViewModal");
+                        List<Movie> movieList = generateMovieObjectList(movieEntries);
+                        generateMovieList(movieList);
+                        adapter.updateList(movieList);
+                    }
+                }
+        );
+    }
+
+    private List<Movie> generateMovieObjectList(List<MovieEntry> movieEntries) {
+        List<Movie> listOfMovies = new ArrayList<>();
+        for(MovieEntry movie : movieEntries ) {
+            listOfMovies.add(new Movie(movie.getPosterPath(),
+                    movie.getUserRating(),
+                    movie.getTitle(),
+                    movie.getSynopsis(),
+                    movie.getReleaseDate(),
+                    movie.getFilmId()));
+        }
+        return listOfMovies;
+    }
+
+    private void generateMovieList(List<Movie> movieData) {
         recyclerView = findViewById(R.id.recycler_view);
         adapter = new MovieAdapter(movieData, this);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
@@ -91,8 +128,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         int itemId = item.getItemId();
         if (itemId == R.id.most_popular) {
             setSortBy(getString(R.string.popular_sort_by));
-        } else {
+        } else if( itemId == R.id.top_rated){
             setSortBy(getString(R.string.top_rated_sort_by));
+        } else if( itemId == R.id.favourite_menu) {
+            createFavouriteMovieList();
         }
         createMovieList(service);
         return true;

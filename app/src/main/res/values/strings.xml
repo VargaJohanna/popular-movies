@@ -12,4 +12,5 @@
     <string name="top_rated_sort_by">top_rated</string>
     <string name="trailers_list_title">Trailers:</string>
     <string name="placeholder_trailer_title">Trailer</string>
+    <string name="my_favourites_menu">My Favourites</string>
 </resources>

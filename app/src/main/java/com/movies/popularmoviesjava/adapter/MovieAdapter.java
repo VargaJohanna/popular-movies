@@ -14,13 +14,14 @@ import com.movies.popularmoviesjava.utilities.ImageSize;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
-    private ArrayList<Movie> movieList;
+    private List<Movie> movieList;
     final private ItemClickListener itemClickListener;
 
-    public MovieAdapter(ArrayList<Movie> movieList, ItemClickListener itemClickListener) {
+    public MovieAdapter(List<Movie> movieList, ItemClickListener itemClickListener) {
         this.movieList = movieList;
         this.itemClickListener = itemClickListener;
     }
@@ -63,5 +64,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     public interface ItemClickListener {
         void onItemClick(Movie movie);
+    }
+
+    public void updateList(List<Movie> list) {
+        movieList = list;
+        notifyDataSetChanged();
     }
 }

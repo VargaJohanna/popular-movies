@@ -24,7 +24,7 @@ public class Movie implements Parcelable {
     @SerializedName("id")
     private String filmId;
 
-    private Movie(Parcel in) {
+    public Movie(Parcel in) {
         posterPath = in.readString();
         userRating = in.readString();
         title = in.readString();
@@ -44,6 +44,15 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    public Movie(String posterPath, String userRating, String title, String synopsis, String releaseDate, String filmId) {
+        this.posterPath = posterPath;
+        this.userRating = userRating;
+        this. title = title;
+        this.synopsis = synopsis;
+        this. releaseDate = releaseDate;
+        this.filmId = filmId;
+    }
 
     public String getPosterPath() {
         return posterPath;
