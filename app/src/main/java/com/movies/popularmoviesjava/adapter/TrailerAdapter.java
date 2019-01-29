@@ -11,13 +11,14 @@ import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
-    private ArrayList<TrailerVideo> trailerList;
+    private List<TrailerVideo> trailerList;
     final private ItemClickListener itemClickListener;
 
 
-    public TrailerAdapter(ArrayList<TrailerVideo> trailerList, ItemClickListener itemClickListener) {
+    public TrailerAdapter(List<TrailerVideo> trailerList, ItemClickListener itemClickListener) {
         this.trailerList = trailerList;
         this.itemClickListener = itemClickListener;
     }

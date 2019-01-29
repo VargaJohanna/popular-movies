@@ -1,7 +1,6 @@
 package com.movies.popularmoviesjava.activity;
 
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,6 +15,8 @@ import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
+import com.movies.popularmoviesjava.database.AppDatabase;
+import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 import com.movies.popularmoviesjava.model.TrailersList;
@@ -28,6 +28,7 @@ import com.movies.popularmoviesjava.utilities.TrailerUrl;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,7 +47,30 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private RecyclerView recyclerView;
     private TrailerAdapter trailerAdapter;
     private Movie movie;
-    public boolean addedToFavourite = false;
+    public boolean addedToFavouriteBoolean = false;
+    private List<String> trailerTitles = new ArrayList<>();
+    private List<String> trailerKeys = new ArrayList<>();
+    private AppDatabase mDb;
+
+    public List<String> getTrailerTitles() {
+        return trailerTitles;
+    }
+
+    public void setTrailerTitles(List<TrailerVideo> videoObjects) {
+        for(TrailerVideo video : videoObjects){
+            this.trailerTitles.add(video.getVideoTitle());
+        }
+    }
+
+    public List<String> getTrailerKeys() {
+        return trailerKeys;
+    }
+
+    public void setTrailerKeys(List<TrailerVideo> videoObjects) {
+        for(TrailerVideo video : videoObjects){
+            this.trailerKeys.add(video.getVideoKey());
+        }
+    }
 
     private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
 
@@ -64,12 +88,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         favouriteButton = findViewById(R.id.favourite_icon);
         updateFavouriteButton();
 
-
         if(intent.hasExtra(MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
             setupUI();
             createTrailerList(service);
         }
+        mDb = AppDatabase.getInstance(getApplicationContext());
     }
 
     private void createTrailerList(GetMovieDataService service) {
@@ -81,9 +105,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             public void onResponse(@NonNull Call<TrailersList> call, @NonNull Response<TrailersList> response) {
                 assert response.body() != null;
                 if(response.body().getTrailersList().size() != 0) {
-                    generateTrailerList(response.body().getTrailersList());
+                    List<TrailerVideo> returnedTrailerVideoList = response.body().getTrailersList();
+                    generateTrailerList(returnedTrailerVideoList);
                     progressBar.setVisibility(View.INVISIBLE);
                     recyclerView.setVisibility(View.VISIBLE);
+                    setTrailerTitles(returnedTrailerVideoList);
+                    setTrailerKeys(returnedTrailerVideoList);
                 } else {
                     recyclerView.setVisibility(View.INVISIBLE);
                 }
@@ -98,7 +125,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     }
 
-    private void generateTrailerList(ArrayList<TrailerVideo> trailers) {
+    private void generateTrailerList(List<TrailerVideo> trailers) {
         recyclerView = findViewById(R.id.recycler_view_trailer);
         trailerAdapter = new TrailerAdapter(trailers, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -140,14 +167,29 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         favouriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!addedToFavourite) {
+                if(!addedToFavouriteBoolean) {
                     favouriteButton.setImageResource(R.drawable.star_small_yellow);
-                    addedToFavourite = true;
+                    addedToFavouriteBoolean = true;
+                    addToFavourites();
                 } else  {
                     favouriteButton.setImageResource(R.drawable.star_small);
-                    addedToFavourite = false;
+                    addedToFavouriteBoolean = false;
                 }
             }
         });
     }
+
+    private void addToFavourites() {
+        MovieEntry movieEntry = new MovieEntry(movie.getPosterPath(),
+                movie.getUserRating(),
+                movie.getTitle(),
+                movie.getSynopsis(),
+                movie.getReleaseDate(),
+                movie.getFilmId(),
+                getTrailerTitles(),
+                getTrailerKeys());
+
+        mDb.movieDao().insertMovie(movieEntry);
+    }
+
 }

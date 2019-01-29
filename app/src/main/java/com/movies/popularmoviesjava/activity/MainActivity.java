@@ -35,7 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
-    private MovieAdapter adapter;
+    private MovieAdapter mainAdapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private String sortBy = "popular";
@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         }
         createMovieList(service);
         mDb = AppDatabase.getInstance(getApplicationContext());
+        mainAdapter = new MovieAdapter(new ArrayList<Movie>(), this);
+        generateMovieList(mainAdapter);
     }
 
     private void createMovieList(GetMovieDataService service) {
@@ -70,7 +72,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             @Override
             public void onResponse(@NonNull Call<MovieList> call, @NonNull Response<MovieList> response) {
                 assert response.body() != null;
-                generateMovieList(response.body().getMovieList());
+                List<Movie> movieList = response.body().getMovieList();
+                mainAdapter.updateList(movieList);
                 progressBar.setVisibility(View.INVISIBLE);
             }
 
@@ -89,8 +92,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                     public void onChanged(@Nullable List<MovieEntry> movieEntries) {
                         Log.d(MainActivity.class.getSimpleName(), "Updating list from LiveData in ViewModal");
                         List<Movie> movieList = generateMovieObjectList(movieEntries);
-                        generateMovieList(movieList);
-                        adapter.updateList(movieList);
+                        mainAdapter.updateList(movieList);
                     }
                 }
         );
@@ -109,9 +111,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         return listOfMovies;
     }
 
-    private void generateMovieList(List<Movie> movieData) {
+    private void generateMovieList(RecyclerView.Adapter adapter) {
         recyclerView = findViewById(R.id.recycler_view);
-        adapter = new MovieAdapter(movieData, this);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -128,12 +129,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         int itemId = item.getItemId();
         if (itemId == R.id.most_popular) {
             setSortBy(getString(R.string.popular_sort_by));
+            createMovieList(service);
         } else if( itemId == R.id.top_rated){
             setSortBy(getString(R.string.top_rated_sort_by));
+            createMovieList(service);
         } else if( itemId == R.id.favourite_menu) {
             createFavouriteMovieList();
         }
-        createMovieList(service);
         return true;
     }
 
