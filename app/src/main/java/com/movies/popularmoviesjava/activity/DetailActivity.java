@@ -1,9 +1,11 @@
 package com.movies.popularmoviesjava.activity;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +22,7 @@ import com.movies.popularmoviesjava.database.AddToFavouritesViewModel;
 import com.movies.popularmoviesjava.database.AddedToFavouritesViewModelFactory;
 import com.movies.popularmoviesjava.database.AppDatabase;
 import com.movies.popularmoviesjava.database.MovieEntry;
+import com.movies.popularmoviesjava.database.TrailerVideoListViewModel;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 import com.movies.popularmoviesjava.model.TrailersList;
@@ -55,7 +58,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private List<String> trailerTitles = new ArrayList<>();
     private List<String> trailerKeys = new ArrayList<>();
     private AppDatabase mDb;
-    private AddToFavouritesViewModel viewModel;
+    private AddToFavouritesViewModel addToFavouritesViewModel;
+    private TrailerVideoListViewModel videoListViewModel;
     private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
 
 
@@ -72,6 +76,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         progressBar = findViewById(R.id.progress_bar_details);
         favouriteButton = findViewById(R.id.favourite_icon);
         mDb = AppDatabase.getInstance(getApplicationContext());
+        videoListViewModel = ViewModelProviders.of(this).get(TrailerVideoListViewModel.class);
 
         if(intent.hasExtra(MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
@@ -82,15 +87,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                AddedToFavouritesViewModelFactory factory = new AddedToFavouritesViewModelFactory(mDb, movie.getFilmId());
-                viewModel = ViewModelProviders.of(DetailActivity.this, factory).get(AddToFavouritesViewModel.class);
                 movieEntry = getMovieEntry();
-                setFavouriteButtonColour(viewModel);
-                addListenerToFavouriteButton(viewModel);
+                AddedToFavouritesViewModelFactory factory = new AddedToFavouritesViewModelFactory(mDb, movie.getFilmId());
+                addToFavouritesViewModel = ViewModelProviders.of(DetailActivity.this, factory).get(AddToFavouritesViewModel.class);
+                setFavouriteButtonColour(addToFavouritesViewModel);
+                addListenerToFavouriteButton(addToFavouritesViewModel);
             }
         });
 
-    }
+        }
 
     public List<String> getTrailerTitles() {
         return trailerTitles;
@@ -134,11 +139,22 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
             @Override
             public void onFailure(@NonNull Call<TrailersList> call, @NonNull Throwable t) {
-                Toast.makeText(DetailActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                if(isFavourite(addToFavouritesViewModel)) {
+                    videoListViewModel.fetchVideoList(movie.getFilmId());
+                        videoListViewModel.getVideoList().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
+                        @Override
+                        public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
+                            generateTrailerList(trailerVideos);
+                            recyclerView.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(DetailActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                }
                 progressBar.setVisibility(View.INVISIBLE);
             }
         });
-
     }
 
     private void generateTrailerList(List<TrailerVideo> trailers) {

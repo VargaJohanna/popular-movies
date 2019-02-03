@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.MovieAdapter;
 import com.movies.popularmoviesjava.database.AppDatabase;
-import com.movies.popularmoviesjava.database.FavouriteMoviesViewModal;
+import com.movies.popularmoviesjava.database.FavouriteMoviesViewModel;
 import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.MovieList;
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void createFavouriteMovieList(){
-        FavouriteMoviesViewModal viewModal = ViewModelProviders.of(this).get(FavouriteMoviesViewModal.class);
+        FavouriteMoviesViewModel viewModal = ViewModelProviders.of(this).get(FavouriteMoviesViewModel.class);
         viewModal.getFavouriteMovies().observe(this, new Observer<List<MovieEntry>>() {
                     @Override
                     public void onChanged(@Nullable List<MovieEntry> movieEntries) {

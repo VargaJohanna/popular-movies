@@ -16,5 +16,4 @@ public class AddedToFavouritesViewModelFactory extends ViewModelProvider.NewInst
     public <T extends ViewModel> T create(Class<T> modelClass) {
         return (T) new AddToFavouritesViewModel(database, movieId);
     }
-
 }

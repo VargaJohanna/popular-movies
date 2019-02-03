@@ -7,13 +7,13 @@ import android.util.Log;
 
 import java.util.List;
 
-public class FavouriteMoviesViewModal extends AndroidViewModel {
+public class FavouriteMoviesViewModel extends AndroidViewModel {
     private LiveData<List<MovieEntry>> favouriteMovies;
 
-    public FavouriteMoviesViewModal(Application application) {
+    public FavouriteMoviesViewModel(Application application) {
         super(application);
         AppDatabase database = AppDatabase.getInstance(this.getApplication());
-        Log.d(FavouriteMoviesViewModal.class.getSimpleName(), "Retrieving data from the database");
+        Log.d(FavouriteMoviesViewModel.class.getSimpleName(), "Retrieving favourites from the database");
         favouriteMovies = database.movieDao().loadAllFavouriteMovies();
     }
 

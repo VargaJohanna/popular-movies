@@ -23,4 +23,7 @@ public interface MovieDao {
 
     @Query("DELETE FROM movie WHERE film_id = :movieId")
     void deleteMovieWithId(String movieId);
+
+    @Query("SELECT * FROM movie WHERE film_id = :movieId")
+    MovieEntry getMovieById(String movieId);
 }

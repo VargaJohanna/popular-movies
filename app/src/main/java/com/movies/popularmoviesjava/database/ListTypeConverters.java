@@ -23,7 +23,7 @@ public class ListTypeConverters {
     }
 
     @TypeConverter
-    public static String listToSring(List<String> listToConvert) {
+    public static String listToString(List<String> listToConvert) {
         return gson.toJson(listToConvert);
     }
 }

@@ -17,6 +17,11 @@ public class TrailerVideo implements Parcelable {
         videoTitle = in.readString();
     }
 
+    public TrailerVideo(String videoKey, String videoTitle) {
+        this.videoKey = videoKey;
+        this.videoTitle = videoTitle;
+    }
+
     public String getVideoKey() {
         return videoKey;
     }
