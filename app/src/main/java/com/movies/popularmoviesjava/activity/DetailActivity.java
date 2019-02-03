@@ -26,6 +26,7 @@ import com.movies.popularmoviesjava.model.TrailersList;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
 import com.movies.popularmoviesjava.utilities.ApiKey;
+import com.movies.popularmoviesjava.utilities.AppExecutors;
 import com.movies.popularmoviesjava.utilities.ImageSize;
 import com.movies.popularmoviesjava.utilities.TrailerUrl;
 import com.squareup.picasso.Picasso;
@@ -77,11 +78,18 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             setupUI();
             createTrailerList(service);
         }
-        AddedToFavouritesViewModelFactory factory = new AddedToFavouritesViewModelFactory(mDb, movie.getFilmId());
-        viewModel = ViewModelProviders.of(this, factory).get(AddToFavouritesViewModel.class);
-        movieEntry = getMovieEntry();
-        setFavouriteButtonColour(viewModel);
-        addListenerToFavouriteButton(viewModel);
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                AddedToFavouritesViewModelFactory factory = new AddedToFavouritesViewModelFactory(mDb, movie.getFilmId());
+                viewModel = ViewModelProviders.of(DetailActivity.this, factory).get(AddToFavouritesViewModel.class);
+                movieEntry = getMovieEntry();
+                setFavouriteButtonColour(viewModel);
+                addListenerToFavouriteButton(viewModel);
+            }
+        });
+
     }
 
     public List<String> getTrailerTitles() {
@@ -177,23 +185,29 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             public void onClick(View v) {
                 if(!isFavourite(viewModel)) {
                     favouriteButton.setImageResource(R.drawable.star_small_yellow);
-                    mDb.movieDao().insertMovie(movieEntry);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.movieDao().insertMovie(movieEntry);
+                        }
+                    });
                 } else {
                     favouriteButton.setImageResource(R.drawable.star_small);
-                    mDb.movieDao().deleteMovieWithId(movie.getFilmId());
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.movieDao().deleteMovieWithId(movie.getFilmId());
+                        }
+                    });
                 }
+
             }
         });
     }
 
     private boolean isFavourite(AddToFavouritesViewModel viewModel) {
         final int countInDb = viewModel.getMovieFoundInFavourites();
-
-        if(countInDb != 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return countInDb != 0;
     }
 
     private void setFavouriteButtonColour(AddToFavouritesViewModel viewModel) {
