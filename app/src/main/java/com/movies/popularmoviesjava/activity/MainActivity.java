@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         mDb = AppDatabase.getInstance(getApplicationContext());
         mainAdapter = new MovieAdapter(new ArrayList<Movie>(), this);
         generateMovieList(mainAdapter);
+        setTitle(R.string.most_popular_title);
     }
 
     private void createMovieList(GetMovieDataService service) {
@@ -130,11 +131,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         if (itemId == R.id.most_popular) {
             setSortBy(getString(R.string.popular_sort_by));
             createMovieList(service);
+            setTitle(R.string.most_popular_title);
         } else if( itemId == R.id.top_rated){
             setSortBy(getString(R.string.top_rated_sort_by));
             createMovieList(service);
+            setTitle(R.string.top_rated_movies_title);
         } else if( itemId == R.id.favourite_menu) {
             createFavouriteMovieList();
+            setTitle(R.string.my_favourites_title);
         }
         return true;
     }

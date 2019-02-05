@@ -13,4 +13,7 @@
     <string name="trailers_list_title">Trailers:</string>
     <string name="placeholder_trailer_title">Trailer</string>
     <string name="my_favourites_menu">My Favourites</string>
+    <string name="most_popular_title">Most Popular Movies</string>
+    <string name="top_rated_movies_title">Top Rated Movies</string>
+    <string name="my_favourites_title">My Favourites</string>
 </resources>

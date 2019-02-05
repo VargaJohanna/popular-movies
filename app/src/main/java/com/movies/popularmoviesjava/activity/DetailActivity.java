@@ -4,10 +4,10 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -18,11 +18,9 @@ import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
-import com.movies.popularmoviesjava.database.AddToFavouritesViewModel;
-import com.movies.popularmoviesjava.database.AddedToFavouritesViewModelFactory;
 import com.movies.popularmoviesjava.database.AppDatabase;
 import com.movies.popularmoviesjava.database.MovieEntry;
-import com.movies.popularmoviesjava.database.TrailerVideoListViewModel;
+import com.movies.popularmoviesjava.database.DetailsViewModel;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 import com.movies.popularmoviesjava.model.TrailersList;
@@ -58,10 +56,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private List<String> trailerTitles = new ArrayList<>();
     private List<String> trailerKeys = new ArrayList<>();
     private AppDatabase mDb;
-    private AddToFavouritesViewModel addToFavouritesViewModel;
-    private TrailerVideoListViewModel videoListViewModel;
+    private DetailsViewModel videoListViewModel;
     private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
-
+    private Boolean mIsFavourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,33 +73,26 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         progressBar = findViewById(R.id.progress_bar_details);
         favouriteButton = findViewById(R.id.favourite_icon);
         mDb = AppDatabase.getInstance(getApplicationContext());
-        videoListViewModel = ViewModelProviders.of(this).get(TrailerVideoListViewModel.class);
+        videoListViewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
+        observeFavouriteState();
 
-        if(intent.hasExtra(MOVIE_OBJECT)) {
+        if (intent.hasExtra(MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
             setupUI();
+            videoListViewModel.fetchMovieInFavourites(movie.getFilmId());
             createTrailerList(service);
         }
-
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                movieEntry = getMovieEntry();
-                AddedToFavouritesViewModelFactory factory = new AddedToFavouritesViewModelFactory(mDb, movie.getFilmId());
-                addToFavouritesViewModel = ViewModelProviders.of(DetailActivity.this, factory).get(AddToFavouritesViewModel.class);
-                setFavouriteButtonColour(addToFavouritesViewModel);
-                addListenerToFavouriteButton(addToFavouritesViewModel);
-            }
-        });
-
-        }
+        movieEntry = getMovieEntry();
+        addListenerToFavouriteButton();
+        setTitle("");
+    }
 
     public List<String> getTrailerTitles() {
         return trailerTitles;
     }
 
     public void setTrailerTitles(List<TrailerVideo> videoObjects) {
-        for(TrailerVideo video : videoObjects){
+        for (TrailerVideo video : videoObjects) {
             this.trailerTitles.add(video.getVideoTitle());
         }
     }
@@ -112,7 +102,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     public void setTrailerKeys(List<TrailerVideo> videoObjects) {
-        for(TrailerVideo video : videoObjects){
+        for (TrailerVideo video : videoObjects) {
             this.trailerKeys.add(video.getVideoKey());
         }
     }
@@ -125,7 +115,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             @Override
             public void onResponse(@NonNull Call<TrailersList> call, @NonNull Response<TrailersList> response) {
                 assert response.body() != null;
-                if(response.body().getTrailersList().size() != 0) {
+                if (response.body().getTrailersList().size() != 0) {
                     List<TrailerVideo> returnedTrailerVideoList = response.body().getTrailersList();
                     generateTrailerList(returnedTrailerVideoList);
                     progressBar.setVisibility(View.INVISIBLE);
@@ -139,16 +129,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
             @Override
             public void onFailure(@NonNull Call<TrailersList> call, @NonNull Throwable t) {
-                if(isFavourite(addToFavouritesViewModel)) {
-                    videoListViewModel.fetchVideoList(movie.getFilmId());
-                        videoListViewModel.getVideoList().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
+                if (mIsFavourite) {
+                    videoListViewModel.getVideoList().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
                         @Override
                         public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
                             generateTrailerList(trailerVideos);
                             recyclerView.setVisibility(View.VISIBLE);
                         }
                     });
-
+                    videoListViewModel.fetchVideoList(movie.getFilmId());
                 } else {
                     Toast.makeText(DetailActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
                 }
@@ -189,49 +178,42 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     public void onItemClick(TrailerVideo video) {
         Uri trailerUri = Uri.parse(TrailerUrl.URL + getTrailerId(video));
         Intent intent = new Intent(Intent.ACTION_VIEW, trailerUri);
-        if(intent.resolveActivity(getPackageManager()) != null) {
+        if (intent.resolveActivity(getPackageManager()) != null) {
             intent.addCategory(Intent.CATEGORY_BROWSABLE);
             startActivity(intent);
         }
     }
 
-    public void addListenerToFavouriteButton(final AddToFavouritesViewModel viewModel) {
+    public void addListenerToFavouriteButton() {
         favouriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isFavourite(viewModel)) {
-                    favouriteButton.setImageResource(R.drawable.star_small_yellow);
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDb.movieDao().insertMovie(movieEntry);
-                        }
-                    });
-                } else {
-                    favouriteButton.setImageResource(R.drawable.star_small);
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDb.movieDao().deleteMovieWithId(movie.getFilmId());
-                        }
-                    });
-                }
-
+                if (!mIsFavourite) AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDb.movieDao().insertMovie(movieEntry);
+                    }
+                });
+                else AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDb.movieDao().deleteMovieWithId(movie.getFilmId());
+                    }
+                });
+                videoListViewModel.fetchMovieInFavourites(movie.getFilmId());
             }
         });
     }
 
-    private boolean isFavourite(AddToFavouritesViewModel viewModel) {
-        final int countInDb = viewModel.getMovieFoundInFavourites();
-        return countInDb != 0;
-    }
-
-    private void setFavouriteButtonColour(AddToFavouritesViewModel viewModel) {
-        if(isFavourite(viewModel)) {
-            favouriteButton.setImageResource(R.drawable.star_small_yellow);
-        } else {
-            favouriteButton.setImageResource(R.drawable.star_small);
-        }
+    private void observeFavouriteState() {
+        videoListViewModel.getIsFavourite().observe(DetailActivity.this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean) favouriteButton.setImageResource(R.drawable.star_small_yellow);
+                else favouriteButton.setImageResource(R.drawable.star_small);
+                mIsFavourite = aBoolean;
+            }
+        });
     }
 
     private MovieEntry getMovieEntry() {
