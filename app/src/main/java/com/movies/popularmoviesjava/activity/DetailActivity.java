@@ -19,8 +19,8 @@ import android.widget.Toast;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
 import com.movies.popularmoviesjava.database.AppDatabase;
-import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.database.DetailsViewModel;
+import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 import com.movies.popularmoviesjava.model.TrailersList;
@@ -107,41 +107,46 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         }
     }
 
-    private void createTrailerList(GetMovieDataService service) {
-        Call<TrailersList> call = service.getTrailerList(getVideoId(), ApiKey.KEY);
-        progressBar.setVisibility(View.VISIBLE);
-
-        call.enqueue(new Callback<TrailersList>() {
+    private void createTrailerList(final GetMovieDataService service) {
+        AppExecutors.getInstance().networkIO().execute(new Runnable() {
             @Override
-            public void onResponse(@NonNull Call<TrailersList> call, @NonNull Response<TrailersList> response) {
-                assert response.body() != null;
-                if (response.body().getTrailersList().size() != 0) {
-                    List<TrailerVideo> returnedTrailerVideoList = response.body().getTrailersList();
-                    generateTrailerList(returnedTrailerVideoList);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    setTrailerTitles(returnedTrailerVideoList);
-                    setTrailerKeys(returnedTrailerVideoList);
-                } else {
-                    recyclerView.setVisibility(View.INVISIBLE);
-                }
-            }
+            public void run() {
+                Call<TrailersList> call = service.getTrailerList(getVideoId(), ApiKey.KEY);
+                progressBar.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onFailure(@NonNull Call<TrailersList> call, @NonNull Throwable t) {
-                if (mIsFavourite) {
-                    videoListViewModel.getVideoList().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
-                        @Override
-                        public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
-                            generateTrailerList(trailerVideos);
+                call.enqueue(new Callback<TrailersList>() {
+                    @Override
+                    public void onResponse(@NonNull Call<TrailersList> call, @NonNull Response<TrailersList> response) {
+                        assert response.body() != null;
+                        if (response.body().getTrailersList().size() != 0) {
+                            List<TrailerVideo> returnedTrailerVideoList = response.body().getTrailersList();
+                            generateTrailerList(returnedTrailerVideoList);
+                            progressBar.setVisibility(View.INVISIBLE);
                             recyclerView.setVisibility(View.VISIBLE);
+                            setTrailerTitles(returnedTrailerVideoList);
+                            setTrailerKeys(returnedTrailerVideoList);
+                        } else {
+                            recyclerView.setVisibility(View.INVISIBLE);
                         }
-                    });
-                    videoListViewModel.fetchVideoList(movie.getFilmId());
-                } else {
-                    Toast.makeText(DetailActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
-                }
-                progressBar.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<TrailersList> call, @NonNull Throwable t) {
+                        if (mIsFavourite) {
+                            videoListViewModel.getVideoList().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
+                                @Override
+                                public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
+                                    generateTrailerList(trailerVideos);
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                }
+                            });
+                            videoListViewModel.fetchVideoList(movie.getFilmId());
+                        } else {
+                            Toast.makeText(DetailActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                        }
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
             }
         });
     }
@@ -188,18 +193,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         favouriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mIsFavourite) AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDb.movieDao().insertMovie(movieEntry);
-                    }
-                });
-                else AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDb.movieDao().deleteMovieWithId(movie.getFilmId());
-                    }
-                });
+                videoListViewModel.updateFavouriteMoviesDb(movieEntry, movie, mIsFavourite);
                 videoListViewModel.fetchMovieInFavourites(movie.getFilmId());
             }
         });
@@ -209,7 +203,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         videoListViewModel.getIsFavourite().observe(DetailActivity.this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean) favouriteButton.setImageResource(R.drawable.star_small_yellow);
+                if (aBoolean) favouriteButton.setImageResource(R.drawable.star_small_yellow);
                 else favouriteButton.setImageResource(R.drawable.star_small);
                 mIsFavourite = aBoolean;
             }

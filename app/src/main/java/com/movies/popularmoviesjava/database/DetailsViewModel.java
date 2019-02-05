@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
+import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 import com.movies.popularmoviesjava.utilities.AppExecutors;
 
@@ -57,6 +58,21 @@ public class DetailsViewModel extends AndroidViewModel {
             public void run() {
                 boolean isFound = database.movieDao().isMovieAddedToFavourites(movieId) != 0;
                 isFavourite.postValue(isFound);
+            }
+        });
+    }
+
+    public void updateFavouriteMoviesDb(final MovieEntry movieEntry, final Movie movie, boolean isFav) {
+        if (!isFav) AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                database.movieDao().insertMovie(movieEntry);
+            }
+        });
+        else AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                database.movieDao().deleteMovieWithId(movie.getFilmId());
             }
         });
     }
