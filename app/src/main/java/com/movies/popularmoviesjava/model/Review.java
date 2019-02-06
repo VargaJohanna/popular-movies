@@ -9,4 +9,8 @@ public class Review {
     public String getReviewContent() {
         return reviewContent;
     }
+
+    public Review(String content) {
+        this.reviewContent = content;
+    }
 }

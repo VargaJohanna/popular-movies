@@ -16,8 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
+import com.movies.popularmoviesjava.adapter.ReviewAdapter;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
-import com.movies.popularmoviesjava.database.AppDatabase;
+import com.movies.popularmoviesjava.model.Review;
 import com.movies.popularmoviesjava.viewmodels.DetailsViewModel;
 import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.model.Movie;
@@ -39,17 +40,20 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     TextView releaseDate;
     TextView userRating;
     TextView synopsis;
+    TextView reviewTitle;
     ImageView favouriteButton;
     private ProgressBar progressBar;
-    private RecyclerView recyclerView;
+    private RecyclerView trailersRecyclerView;
+    private RecyclerView reviewsRecyclerView;
     private TrailerAdapter trailerAdapter;
+    private ReviewAdapter reviewAdapter;
     private Movie movie;
     private MovieEntry movieEntry;
     private List<String> trailerTitles = new ArrayList<>();
     private List<String> trailerKeys = new ArrayList<>();
-    private AppDatabase mDb;
+    private List<String> reviewList = new ArrayList<>();
     private DetailsViewModel viewModel;
-    private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
+    private GetMovieDataService service;
     private Boolean mIsFavourite;
 
     @Override
@@ -64,18 +68,22 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         synopsis = findViewById(R.id.synopsis);
         progressBar = findViewById(R.id.progress_bar_details);
         favouriteButton = findViewById(R.id.favourite_icon);
-        mDb = AppDatabase.getInstance(getApplicationContext());
+        trailersRecyclerView = findViewById(R.id.recycler_view_trailer);
+        reviewsRecyclerView = findViewById(R.id.recycler_view_reviews);
+        reviewTitle = findViewById(R.id.review_list_title);
         viewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
+        service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
         observeFavouriteState();
 
         if (intent.hasExtra(MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
             setupUI();
             viewModel.fetchMovieInFavourites(movie.getFilmId());
-            createTrailerList(service);
+            observeTrailerList();
         }
         movieEntry = getMovieEntry();
         addListenerToFavouriteButton();
+        observeReviewList();
         setTitle("");
     }
 
@@ -99,13 +107,23 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         }
     }
 
-    private void createTrailerList(final GetMovieDataService service) {
+    public List<String> getReviewList() {
+        return reviewList;
+    }
+
+    public void setReviewList(List<Review> reviewObjects) {
+        for(Review review : reviewObjects) {
+            this.reviewList.add(review.getReviewContent());
+        }
+    }
+
+    private void observeTrailerList() {
         viewModel.getTrailerVideoListFromApi().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
             @Override
             public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
                 if(trailerVideos != null) {
                     generateTrailerList(trailerVideos);
-                    recyclerView.setVisibility(View.VISIBLE);
+                    trailersRecyclerView.setVisibility(View.VISIBLE);
                     setTrailerTitles(trailerVideos);
                     setTrailerKeys(trailerVideos);
                 } else if(mIsFavourite) {
@@ -113,7 +131,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                         @Override
                         public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
                             generateTrailerList(trailerVideos);
-                            recyclerView.setVisibility(View.VISIBLE);
+                            trailersRecyclerView.setVisibility(View.VISIBLE);
                         }
                     });
                     viewModel.fetchVideoListFromDb(movie.getFilmId());
@@ -123,15 +141,14 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 progressBar.setVisibility(View.INVISIBLE);
             }
         });
-        viewModel.fetchTrailerVideoListFromAPi(service, movie);
+        viewModel.fetchTrailerVideoListFromAPi(service, movie.getFilmId());
     }
 
     private void generateTrailerList(List<TrailerVideo> trailers) {
-        recyclerView = findViewById(R.id.recycler_view_trailer);
         trailerAdapter = new TrailerAdapter(trailers, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(trailerAdapter);
+        trailersRecyclerView.setLayoutManager(layoutManager);
+        trailersRecyclerView.setAdapter(trailerAdapter);
     }
 
     private void setupUI() {
@@ -189,6 +206,46 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 movie.getReleaseDate(),
                 movie.getFilmId(),
                 getTrailerTitles(),
-                getTrailerKeys());
+                getTrailerKeys(),
+                getReviewList());
+    }
+
+    private void observeReviewList() {
+        viewModel.getReviewsListFromApi().observe(this, new Observer<List<Review>>() {
+            @Override
+            public void onChanged(@Nullable List<Review> reviews) {
+                if(reviews != null) {
+                    generateReviewList(reviews);
+                    reviewsRecyclerView.setVisibility(View.VISIBLE);
+                    setReviewList(reviews);
+                } else if(mIsFavourite) {
+                    viewModel.getReviewsListFromDb().observe(DetailActivity.this, new Observer<List<Review>>() {
+                        @Override
+                        public void onChanged(@Nullable List<Review> reviews) {
+                            if(reviews.size() != 0) {
+                                generateReviewList(reviews);
+                                reviewsRecyclerView.setVisibility(View.VISIBLE);
+                            } else {
+                                reviewTitle.setText("");
+                                reviewsRecyclerView.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                    });
+                    viewModel.fetchReviewListFromDb(movie.getFilmId());
+                }
+                else {
+                    reviewTitle.setText("");
+                    reviewsRecyclerView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+        viewModel.fetchReviewsFromApi(service, movie.getFilmId());
+    }
+
+    private void generateReviewList(List<Review> reviews) {
+        reviewAdapter = new ReviewAdapter(reviews);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        reviewsRecyclerView.setLayoutManager(layoutManager);
+        reviewsRecyclerView.setAdapter(reviewAdapter);
     }
 }

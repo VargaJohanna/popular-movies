@@ -1,6 +1,7 @@
 package com.movies.popularmoviesjava.network;
 
 import com.movies.popularmoviesjava.model.MovieList;
+import com.movies.popularmoviesjava.model.ReviewsList;
 import com.movies.popularmoviesjava.model.TrailersList;
 
 import retrofit2.Call;
@@ -18,6 +19,6 @@ public interface GetMovieDataService {
                                       @Query("api_key")String apiKey);
 
     @GET("/3/movie/{video_id}/reviews")
-    Call<TrailersList> getReviewList(@Path("video_id")String sortBy,
-                                      @Query("api_key")String apiKey);
+    Call<ReviewsList> getReviewList(@Path("video_id")String videoId,
+                                    @Query("api_key")String apiKey);
 }

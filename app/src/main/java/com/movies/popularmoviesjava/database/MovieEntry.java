@@ -28,9 +28,19 @@ public class MovieEntry {
     @ColumnInfo(name = "trailer_keys")
     @TypeConverters(ListTypeConverters.class)
     private List<String> trailerKeys;
+    @TypeConverters(ListTypeConverters.class)
+    private List<String> reviews;
 
     @Ignore
-    public  MovieEntry(String posterPath, String userRating, String title, String synopsis, String releaseDate, String filmId, List<String> trailerTitles, List<String> trailerKeys) {
+    public MovieEntry(String posterPath,
+                      String userRating,
+                      String title,
+                      String synopsis,
+                      String releaseDate,
+                      String filmId,
+                      List<String> trailerTitles,
+                      List<String> trailerKeys,
+                      List<String> reviews) {
         this.posterPath = posterPath;
         this.userRating = userRating;
         this.title = title;
@@ -39,9 +49,19 @@ public class MovieEntry {
         this.filmId = filmId;
         this.trailerTitles = trailerTitles;
         this.trailerKeys = trailerKeys;
+        this.reviews = reviews;
     }
 
-    public  MovieEntry(int id, String posterPath, String userRating, String title, String synopsis, String releaseDate, String filmId, List<String> trailerTitles, List<String> trailerKeys) {
+    public MovieEntry(int id,
+                      String posterPath,
+                      String userRating,
+                      String title,
+                      String synopsis,
+                      String releaseDate,
+                      String filmId,
+                      List<String> trailerTitles,
+                      List<String> trailerKeys,
+                      List<String> reviews) {
         this.id = id;
         this.posterPath = posterPath;
         this.userRating = userRating;
@@ -51,6 +71,7 @@ public class MovieEntry {
         this.filmId = filmId;
         this.trailerTitles = trailerTitles;
         this.trailerKeys = trailerKeys;
+        this.reviews = reviews;
     }
 
     public int getId() {
@@ -108,6 +129,7 @@ public class MovieEntry {
     public void setFilmId(String filmId) {
         this.filmId = filmId;
     }
+
     public List<String> getTrailerTitles() {
         return trailerTitles;
     }
@@ -122,5 +144,13 @@ public class MovieEntry {
 
     public void setTrailerKeys(List<String> trailerKeys) {
         this.trailerKeys = trailerKeys;
+    }
+
+    public List<String> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<String> reviews) {
+        this.reviews = reviews;
     }
 }

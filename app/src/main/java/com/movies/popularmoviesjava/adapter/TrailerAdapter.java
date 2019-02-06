@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
