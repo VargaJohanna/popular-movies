@@ -14,6 +14,10 @@ public interface GetMovieDataService {
                                  @Query("api_key")String apiKey);
 
     @GET("/3/movie/{video_id}/videos")
-    Call<TrailersList> getTrailerList(@Path("video_id")String sortBy,
+    Call<TrailersList> getTrailerList(@Path("video_id")String videoId,
+                                      @Query("api_key")String apiKey);
+
+    @GET("/3/movie/{video_id}/reviews")
+    Call<TrailersList> getReviewList(@Path("video_id")String sortBy,
                                       @Query("api_key")String apiKey);
 }

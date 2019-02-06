@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,25 +18,18 @@ import android.widget.Toast;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
 import com.movies.popularmoviesjava.database.AppDatabase;
-import com.movies.popularmoviesjava.database.DetailsViewModel;
+import com.movies.popularmoviesjava.viewmodels.DetailsViewModel;
 import com.movies.popularmoviesjava.database.MovieEntry;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.model.TrailerVideo;
-import com.movies.popularmoviesjava.model.TrailersList;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
-import com.movies.popularmoviesjava.utilities.ApiKey;
-import com.movies.popularmoviesjava.utilities.AppExecutors;
 import com.movies.popularmoviesjava.utilities.ImageSize;
 import com.movies.popularmoviesjava.utilities.TrailerUrl;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener {
     public static final String MOVIE_OBJECT = "movie";
@@ -56,7 +48,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private List<String> trailerTitles = new ArrayList<>();
     private List<String> trailerKeys = new ArrayList<>();
     private AppDatabase mDb;
-    private DetailsViewModel videoListViewModel;
+    private DetailsViewModel viewModel;
     private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
     private Boolean mIsFavourite;
 
@@ -73,13 +65,13 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         progressBar = findViewById(R.id.progress_bar_details);
         favouriteButton = findViewById(R.id.favourite_icon);
         mDb = AppDatabase.getInstance(getApplicationContext());
-        videoListViewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
         observeFavouriteState();
 
         if (intent.hasExtra(MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
             setupUI();
-            videoListViewModel.fetchMovieInFavourites(movie.getFilmId());
+            viewModel.fetchMovieInFavourites(movie.getFilmId());
             createTrailerList(service);
         }
         movieEntry = getMovieEntry();
@@ -108,47 +100,30 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private void createTrailerList(final GetMovieDataService service) {
-        AppExecutors.getInstance().networkIO().execute(new Runnable() {
+        viewModel.getTrailerVideoListFromApi().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
             @Override
-            public void run() {
-                Call<TrailersList> call = service.getTrailerList(getVideoId(), ApiKey.KEY);
-                progressBar.setVisibility(View.VISIBLE);
-
-                call.enqueue(new Callback<TrailersList>() {
-                    @Override
-                    public void onResponse(@NonNull Call<TrailersList> call, @NonNull Response<TrailersList> response) {
-                        assert response.body() != null;
-                        if (response.body().getTrailersList().size() != 0) {
-                            List<TrailerVideo> returnedTrailerVideoList = response.body().getTrailersList();
-                            generateTrailerList(returnedTrailerVideoList);
-                            progressBar.setVisibility(View.INVISIBLE);
+            public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
+                if(trailerVideos != null) {
+                    generateTrailerList(trailerVideos);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    setTrailerTitles(trailerVideos);
+                    setTrailerKeys(trailerVideos);
+                } else if(mIsFavourite) {
+                    viewModel.getVideoListFromDb().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
+                        @Override
+                        public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
+                            generateTrailerList(trailerVideos);
                             recyclerView.setVisibility(View.VISIBLE);
-                            setTrailerTitles(returnedTrailerVideoList);
-                            setTrailerKeys(returnedTrailerVideoList);
-                        } else {
-                            recyclerView.setVisibility(View.INVISIBLE);
                         }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<TrailersList> call, @NonNull Throwable t) {
-                        if (mIsFavourite) {
-                            videoListViewModel.getVideoList().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
-                                @Override
-                                public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
-                                    generateTrailerList(trailerVideos);
-                                    recyclerView.setVisibility(View.VISIBLE);
-                                }
-                            });
-                            videoListViewModel.fetchVideoList(movie.getFilmId());
-                        } else {
-                            Toast.makeText(DetailActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
-                        }
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
+                    });
+                    viewModel.fetchVideoListFromDb(movie.getFilmId());
+                } else {
+                    Toast.makeText(DetailActivity.this, "Something went wrong. We couldn't fetch trailers...", Toast.LENGTH_SHORT).show();
+                }
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
+        viewModel.fetchTrailerVideoListFromAPi(service, movie);
     }
 
     private void generateTrailerList(List<TrailerVideo> trailers) {
@@ -171,10 +146,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         releaseDate.setText(String.format("%s %s", getString(R.string.released_label), movie.getReleaseDate()));
     }
 
-    private String getVideoId() {
-        return movie.getFilmId();
-    }
-
     private String getTrailerId(TrailerVideo video) {
         return video.getVideoKey();
     }
@@ -193,14 +164,14 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         favouriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                videoListViewModel.updateFavouriteMoviesDb(movieEntry, movie, mIsFavourite);
-                videoListViewModel.fetchMovieInFavourites(movie.getFilmId());
+                viewModel.updateFavouriteMoviesDb(movieEntry, movie, mIsFavourite);
+                viewModel.fetchMovieInFavourites(movie.getFilmId());
             }
         });
     }
 
     private void observeFavouriteState() {
-        videoListViewModel.getIsFavourite().observe(DetailActivity.this, new Observer<Boolean>() {
+        viewModel.getIsFavourite().observe(DetailActivity.this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if (aBoolean) favouriteButton.setImageResource(R.drawable.star_small_yellow);
