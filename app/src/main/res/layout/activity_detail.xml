@@ -22,7 +22,7 @@
 
         <ImageView
             android:id="@+id/favourite_icon"
-            android:src="@drawable/star_small"
+            android:src="@drawable/ic_five_pointed_star"
             android:layout_gravity="center"
             android:layout_width="30dp"
             android:layout_height="30dp" />

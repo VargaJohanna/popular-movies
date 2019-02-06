@@ -191,8 +191,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         viewModel.getIsFavourite().observe(DetailActivity.this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                if (aBoolean) favouriteButton.setImageResource(R.drawable.star_small_yellow);
-                else favouriteButton.setImageResource(R.drawable.star_small);
+                if (aBoolean) favouriteButton.setImageResource(R.drawable.ic_blue_star);
+                else favouriteButton.setImageResource(R.drawable.ic_five_pointed_star);
                 mIsFavourite = aBoolean;
             }
         });
