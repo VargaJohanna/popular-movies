@@ -3,6 +3,7 @@ package com.movies.popularmoviesjava.activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.MovieAdapter;
 import com.movies.popularmoviesjava.database.MovieEntry;
+import com.movies.popularmoviesjava.databinding.ActivityMainBinding;
 import com.movies.popularmoviesjava.model.Movie;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
@@ -27,9 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
+    ActivityMainBinding mBinding;
     private MovieAdapter mainAdapter;
-    private RecyclerView recyclerView;
-    private ProgressBar progressBar;
     private String sortBy = "popular";
     private static final String SORT_BY_KEY = "SORT_BY";
     private MainViewModel viewModel;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        progressBar = findViewById(R.id.progress_bar);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         if (savedInstanceState != null) {
             setSortBy(savedInstanceState.getString(SORT_BY_KEY));
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void observeMovieList(final GetMovieDataService service) {
-        progressBar.setVisibility(View.VISIBLE);
+        mBinding.progressBar.setVisibility(View.VISIBLE);
 
         viewModel.getMovieListFromApi().observe(MainActivity.this, new Observer<List<Movie>>() {
             @Override
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 } else {
                     Toast.makeText(MainActivity.this, R.string.no_internet_message, Toast.LENGTH_LONG).show();
                 }
-                progressBar.setVisibility(View.INVISIBLE);
+                mBinding.progressBar.setVisibility(View.INVISIBLE);
             }
         });
         viewModel.fetchMovieListFromApi(service, getSortBy());
@@ -99,10 +100,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void generateMovieList(RecyclerView.Adapter adapter) {
-        recyclerView = findViewById(R.id.recycler_view);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        mBinding.recyclerView.setLayoutManager(layoutManager);
+        mBinding.recyclerView.setAdapter(adapter);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.movies.popularmoviesjava.activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.ReviewAdapter;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
+import com.movies.popularmoviesjava.databinding.ActivityDetailBinding;
 import com.movies.popularmoviesjava.model.Review;
 import com.movies.popularmoviesjava.viewmodels.DetailsViewModel;
 import com.movies.popularmoviesjava.database.MovieEntry;
@@ -33,18 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener {
+    ActivityDetailBinding mBinding;
     public static final String MOVIE_OBJECT = "movie";
     Intent intent;
-    TextView movieTitle;
-    ImageView image;
-    TextView releaseDate;
-    TextView userRating;
-    TextView synopsis;
-    TextView reviewTitle;
-    ImageView favouriteButton;
-    private ProgressBar progressBar;
-    private RecyclerView trailersRecyclerView;
-    private RecyclerView reviewsRecyclerView;
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
     private Movie movie;
@@ -60,17 +53,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
         intent = getIntent();
-        movieTitle = findViewById(R.id.movie_title);
-        image = findViewById(R.id.thumbnail_image);
-        releaseDate = findViewById(R.id.release_date);
-        userRating = findViewById(R.id.user_rating);
-        synopsis = findViewById(R.id.synopsis);
-        progressBar = findViewById(R.id.progress_bar_details);
-        favouriteButton = findViewById(R.id.favourite_icon);
-        trailersRecyclerView = findViewById(R.id.recycler_view_trailer);
-        reviewsRecyclerView = findViewById(R.id.recycler_view_reviews);
-        reviewTitle = findViewById(R.id.review_list_title);
         viewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
         service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
         observeFavouriteState();
@@ -123,7 +107,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
                 if(trailerVideos != null) {
                     generateTrailerList(trailerVideos);
-                    trailersRecyclerView.setVisibility(View.VISIBLE);
+                    mBinding.recyclerViewTrailer.setVisibility(View.VISIBLE);
                     setTrailerTitles(trailerVideos);
                     setTrailerKeys(trailerVideos);
                 } else if(mIsFavourite) {
@@ -131,14 +115,14 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                         @Override
                         public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
                             generateTrailerList(trailerVideos);
-                            trailersRecyclerView.setVisibility(View.VISIBLE);
+                            mBinding.recyclerViewTrailer.setVisibility(View.VISIBLE);
                         }
                     });
                     viewModel.fetchVideoListFromDb(movie.getFilmId());
                 } else {
                     Toast.makeText(DetailActivity.this, "Something went wrong. We couldn't fetch trailers...", Toast.LENGTH_SHORT).show();
                 }
-                progressBar.setVisibility(View.INVISIBLE);
+                mBinding.progressBarDetails.setVisibility(View.INVISIBLE);
             }
         });
         viewModel.fetchTrailerVideoListFromAPi(service, movie.getFilmId());
@@ -147,20 +131,20 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private void generateTrailerList(List<TrailerVideo> trailers) {
         trailerAdapter = new TrailerAdapter(trailers, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        trailersRecyclerView.setLayoutManager(layoutManager);
-        trailersRecyclerView.setAdapter(trailerAdapter);
+        mBinding.recyclerViewTrailer.setLayoutManager(layoutManager);
+        mBinding.recyclerViewTrailer.setAdapter(trailerAdapter);
     }
 
     private void setupUI() {
-        movieTitle.setText(movie.getTitle());
+        mBinding.movieTitle.setText(movie.getTitle());
         Picasso.get()
                 .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.getImageSize(4) + movie.getPosterPath())
                 .placeholder(R.drawable.ic_launcher_background)
-                .into(image);
+                .into(mBinding.thumbnailImage);
 
-        synopsis.setText(movie.getSynopsis());
-        userRating.setText(String.format("%s %s", getString(R.string.rating_label), movie.getUserRating()));
-        releaseDate.setText(String.format("%s %s", getString(R.string.released_label), movie.getReleaseDate()));
+        mBinding.synopsis.setText(movie.getSynopsis());
+        mBinding.userRating.setText(String.format("%s %s", getString(R.string.rating_label), movie.getUserRating()));
+        mBinding.releaseDate.setText(String.format("%s %s", getString(R.string.released_label), movie.getReleaseDate()));
     }
 
     private String getTrailerId(TrailerVideo video) {
@@ -178,7 +162,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     public void addListenerToFavouriteButton() {
-        favouriteButton.setOnClickListener(new View.OnClickListener() {
+        mBinding.favouriteIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 viewModel.updateFavouriteMoviesDb(movieEntry, movie, mIsFavourite);
@@ -191,8 +175,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         viewModel.getIsFavourite().observe(DetailActivity.this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                if (aBoolean) favouriteButton.setImageResource(R.drawable.ic_blue_star);
-                else favouriteButton.setImageResource(R.drawable.ic_five_pointed_star);
+                if (aBoolean) mBinding.favouriteIcon.setImageResource(R.drawable.ic_blue_star);
+                else mBinding.favouriteIcon.setImageResource(R.drawable.ic_five_pointed_star);
                 mIsFavourite = aBoolean;
             }
         });
@@ -216,7 +200,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             public void onChanged(@Nullable List<Review> reviews) {
                 if(reviews != null) {
                     generateReviewList(reviews);
-                    reviewsRecyclerView.setVisibility(View.VISIBLE);
+                    mBinding.recyclerViewReviews.setVisibility(View.VISIBLE);
                     setReviewList(reviews);
                 } else if(mIsFavourite) {
                     viewModel.getReviewsListFromDb().observe(DetailActivity.this, new Observer<List<Review>>() {
@@ -224,18 +208,18 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                         public void onChanged(@Nullable List<Review> reviews) {
                             if(reviews.size() != 0) {
                                 generateReviewList(reviews);
-                                reviewsRecyclerView.setVisibility(View.VISIBLE);
+                                mBinding.recyclerViewReviews.setVisibility(View.VISIBLE);
                             } else {
-                                reviewTitle.setText("");
-                                reviewsRecyclerView.setVisibility(View.INVISIBLE);
+                                mBinding.reviewListTitle.setText("");
+                                mBinding.recyclerViewReviews.setVisibility(View.INVISIBLE);
                             }
                         }
                     });
                     viewModel.fetchReviewListFromDb(movie.getFilmId());
                 }
                 else {
-                    reviewTitle.setText("");
-                    reviewsRecyclerView.setVisibility(View.INVISIBLE);
+                    mBinding.reviewListTitle.setText("");
+                    mBinding.recyclerViewReviews.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -245,7 +229,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private void generateReviewList(List<Review> reviews) {
         reviewAdapter = new ReviewAdapter(reviews);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        reviewsRecyclerView.setLayoutManager(layoutManager);
-        reviewsRecyclerView.setAdapter(reviewAdapter);
+        mBinding.recyclerViewReviews.setLayoutManager(layoutManager);
+        mBinding.recyclerViewReviews.setAdapter(reviewAdapter);
     }
 }
