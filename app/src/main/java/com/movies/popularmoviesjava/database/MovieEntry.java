@@ -30,6 +30,8 @@ public class MovieEntry {
     private List<String> trailerKeys;
     @TypeConverters(ListTypeConverters.class)
     private List<String> reviews;
+    @TypeConverters(ListTypeConverters.class)
+    private List<String> authors;
 
     @Ignore
     public MovieEntry(String posterPath,
@@ -40,7 +42,8 @@ public class MovieEntry {
                       String filmId,
                       List<String> trailerTitles,
                       List<String> trailerKeys,
-                      List<String> reviews) {
+                      List<String> reviews,
+                      List<String> authors) {
         this.posterPath = posterPath;
         this.userRating = userRating;
         this.title = title;
@@ -50,6 +53,7 @@ public class MovieEntry {
         this.trailerTitles = trailerTitles;
         this.trailerKeys = trailerKeys;
         this.reviews = reviews;
+        this.authors = authors;
     }
 
     public MovieEntry(int id,
@@ -61,7 +65,8 @@ public class MovieEntry {
                       String filmId,
                       List<String> trailerTitles,
                       List<String> trailerKeys,
-                      List<String> reviews) {
+                      List<String> reviews,
+                      List<String> authors) {
         this.id = id;
         this.posterPath = posterPath;
         this.userRating = userRating;
@@ -72,6 +77,7 @@ public class MovieEntry {
         this.trailerTitles = trailerTitles;
         this.trailerKeys = trailerKeys;
         this.reviews = reviews;
+        this.authors = authors;
     }
 
     public int getId() {
@@ -152,5 +158,13 @@ public class MovieEntry {
 
     public void setReviews(List<String> reviews) {
         this.reviews = reviews;
+    }
+
+    public List<String> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<String> authors) {
+        this.authors = authors;
     }
 }

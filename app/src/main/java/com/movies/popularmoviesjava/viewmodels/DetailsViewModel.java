@@ -158,15 +158,16 @@ public class DetailsViewModel extends AndroidViewModel {
             public void run() {
                 MovieEntry movie = database.movieDao().getMovieById(movieId);
                 List<String> listOfReviews = movie.getReviews();
-                reviewsListFromDb.postValue(getListOfReviewObjects(listOfReviews));
+                List<String> listOfAuthors = movie.getAuthors();
+                reviewsListFromDb.postValue(getListOfReviewObjects(listOfReviews, listOfAuthors));
             }
         });
     }
 
-    public List<Review> getListOfReviewObjects(List<String> review) {
+    public List<Review> getListOfReviewObjects(List<String> reviews, List<String> authors) {
         List<Review> listOfReviews = new ArrayList<>();
-        for (String reviewText : review) {
-            listOfReviews.add(new Review(reviewText));
+        for(int i = 0; i < reviews.size(); i++) {
+            listOfReviews.add(new Review(reviews.get(i), authors.get(i)));
         }
         return listOfReviews;
     }

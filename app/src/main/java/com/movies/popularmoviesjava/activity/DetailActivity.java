@@ -45,6 +45,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private List<String> trailerTitles = new ArrayList<>();
     private List<String> trailerKeys = new ArrayList<>();
     private List<String> reviewList = new ArrayList<>();
+    private List<String> reviewAuthorsList = new ArrayList<>();
     private DetailsViewModel viewModel;
     private GetMovieDataService service;
     private Boolean mIsFavourite;
@@ -68,7 +69,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         movieEntry = getMovieEntry();
         addListenerToFavouriteButton();
         observeReviewList();
-        setTitle("");
+        setTitle(movie.getTitle());
     }
 
     public List<String> getTrailerTitles() {
@@ -97,7 +98,17 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     public void setReviewList(List<Review> reviewObjects) {
         for(Review review : reviewObjects) {
-            this.reviewList.add(review.getReviewContent());
+            this.reviewList.add(review.getReviewContent().trim());
+        }
+    }
+
+    public List<String> getReviewAuthorsList() {
+        return reviewAuthorsList;
+    }
+
+    public void setReviewAuthorsList(List<Review> reviewObjects) {
+        for(Review review : reviewObjects) {
+            this.reviewAuthorsList.add(review.getReviewAuthor().trim());
         }
     }
 
@@ -136,7 +147,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private void setupUI() {
-        mBinding.movieTitle.setText(movie.getTitle());
         Picasso.get()
                 .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.getImageSize(4) + movie.getPosterPath())
                 .placeholder(R.drawable.ic_launcher_background)
@@ -191,7 +201,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 movie.getFilmId(),
                 getTrailerTitles(),
                 getTrailerKeys(),
-                getReviewList());
+                getReviewList(),
+                getReviewAuthorsList());
     }
 
     private void observeReviewList() {
@@ -202,6 +213,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     generateReviewList(reviews);
                     mBinding.recyclerViewReviews.setVisibility(View.VISIBLE);
                     setReviewList(reviews);
+                    setReviewAuthorsList(reviews);
                 } else if(mIsFavourite) {
                     viewModel.getReviewsListFromDb().observe(DetailActivity.this, new Observer<List<Review>>() {
                         @Override
@@ -210,7 +222,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                                 generateReviewList(reviews);
                                 mBinding.recyclerViewReviews.setVisibility(View.VISIBLE);
                             } else {
-                                mBinding.reviewListTitle.setText("");
+                                mBinding.reviewListTitle.setVisibility(View.INVISIBLE);
                                 mBinding.recyclerViewReviews.setVisibility(View.INVISIBLE);
                             }
                         }
@@ -218,7 +230,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     viewModel.fetchReviewListFromDb(movie.getFilmId());
                 }
                 else {
-                    mBinding.reviewListTitle.setText("");
+                    mBinding.reviewListTitle.setVisibility(View.INVISIBLE);
                     mBinding.recyclerViewReviews.setVisibility(View.INVISIBLE);
                 }
             }

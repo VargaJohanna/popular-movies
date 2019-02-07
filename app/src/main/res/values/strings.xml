@@ -18,4 +18,7 @@
     <string name="my_favourites_title">My Favourites</string>
     <string name="no_internet_message">Something went wrong. Check your internet connection…</string>
     <string name="reviews_list_title">Reviews:</string>
+    <string name="author_label">From:</string>
+    <string name="author_name_placeholder">author name</string>
+    <string name="review_placeholder">review</string>
 </resources>
