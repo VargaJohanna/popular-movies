@@ -13,7 +13,6 @@ import com.movies.popularmoviesjava.network.RetrofitInstance;
 import com.movies.popularmoviesjava.utilities.ImageSize;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

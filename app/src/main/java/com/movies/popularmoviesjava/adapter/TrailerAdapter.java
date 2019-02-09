@@ -21,6 +21,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         this.trailerList = trailerList;
         this.itemClickListener = itemClickListener;
     }
+
     @NonNull
     @Override
     public TrailerAdapter.TrailerAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -39,7 +40,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         return trailerList.size();
     }
 
-    class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final TextView trailerTitle;
 
         TrailerAdapterViewHolder(View itemView) {

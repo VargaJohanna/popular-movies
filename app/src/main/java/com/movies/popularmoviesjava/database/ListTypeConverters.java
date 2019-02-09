@@ -14,11 +14,12 @@ public class ListTypeConverters {
 
     @TypeConverter
     public static List<String> stringToList(String data) {
-        if(data == null){
+        if (data == null) {
             return Collections.emptyList();
         }
 
-        Type listType = new TypeToken<List<String>>(){}.getType();
+        Type listType = new TypeToken<List<String>>() {
+        }.getType();
         return gson.fromJson(data, listType);
     }
 

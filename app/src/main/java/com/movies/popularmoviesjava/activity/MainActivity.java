@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         mainAdapter = new MovieAdapter(new ArrayList<Movie>(), this);
         observeSortBy();
         String sortByValue = viewModel.getSortBy().getValue();
-        if(sortByValue == null) {
+        if (sortByValue == null) {
             viewModel.setSortBy(getString(R.string.popular_sort_by));
         }
         observeMovieList();
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             @Override
             public void onChanged(@Nullable String s) {
                 assert s != null;
-                if(!s.equals(getString(R.string.favourite_sort_by))) {
+                if (!s.equals(getString(R.string.favourite_sort_by))) {
                     viewModel.fetchMovieListFromApi(service, s);
                 } else {
                     getFavouriteMovieList();
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             public void onChanged(@Nullable List<Movie> movies) {
                 if (!movies.isEmpty() && !viewModel.getSortBy().getValue().equals(getString(R.string.favourite_sort_by))) {
                     mainAdapter.updateList(movies);
-                } else if (!viewModel.getSortBy().getValue().equals(getString(R.string.favourite_sort_by))){
+                } else if (!viewModel.getSortBy().getValue().equals(getString(R.string.favourite_sort_by))) {
                     Toast.makeText(MainActivity.this, R.string.no_internet_message, Toast.LENGTH_LONG).show();
                 }
                 mBinding.progressBar.setVisibility(View.INVISIBLE);
@@ -128,21 +128,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         } else if (itemId == R.id.favourite_menu) {
             viewModel.setSortBy(getString(R.string.favourite_sort_by));
         }
-        if(viewModel.getSortBy().getValue() != null) {
+        if (viewModel.getSortBy().getValue() != null) {
             setAppTitle(viewModel.getSortBy().getValue());
         }
         return true;
     }
 
     private void setAppTitle(String actualSortBy) {
-        if(actualSortBy.equals(getString(R.string.popular_sort_by))) {
+        if (actualSortBy.equals(getString(R.string.popular_sort_by))) {
             setTitle(R.string.most_popular_title);
-        } else if(actualSortBy.equals(getString(R.string.top_rated_sort_by))) {
+        } else if (actualSortBy.equals(getString(R.string.top_rated_sort_by))) {
             setTitle(R.string.top_rated_movies_title);
-        } else if(actualSortBy.equals(getString(R.string.favourite_sort_by))) {
+        } else if (actualSortBy.equals(getString(R.string.favourite_sort_by))) {
             setTitle(R.string.my_favourites_title);
         }
     }
+
     @Override
     public void onItemClick(Movie movie) {
         Intent detailActivity = new Intent(this, DetailActivity.class);

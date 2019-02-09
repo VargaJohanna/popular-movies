@@ -26,7 +26,7 @@ import retrofit2.Response;
 
 public class DetailsViewModel extends AndroidViewModel {
     private MutableLiveData<List<TrailerVideo>> videoListFromDb;
-        private MutableLiveData<Boolean> isFavourite;
+    private MutableLiveData<Boolean> isFavourite;
     private MutableLiveData<List<TrailerVideo>> trailerVideoListFromApi;
     private MutableLiveData<List<Review>> reviewsListFromApi;
     private MutableLiveData<List<Review>> reviewsListFromDb;
@@ -133,12 +133,13 @@ public class DetailsViewModel extends AndroidViewModel {
                     @Override
                     public void onResponse(Call<ReviewsList> call, Response<ReviewsList> response) {
                         assert response.body() != null;
-                        if(response.body().getReviewList().size() != 0) {
+                        if (response.body().getReviewList().size() != 0) {
                             reviewsListFromApi.postValue(response.body().getReviewList());
                         } else {
                             reviewsListFromApi.postValue(null);
                         }
                     }
+
                     @Override
                     public void onFailure(Call<ReviewsList> call, Throwable t) {
                         reviewsListFromApi.postValue(null);
@@ -166,7 +167,7 @@ public class DetailsViewModel extends AndroidViewModel {
 
     public List<Review> getListOfReviewObjects(List<String> reviews, List<String> authors) {
         List<Review> listOfReviews = new ArrayList<>();
-        for(int i = 0; i < reviews.size(); i++) {
+        for (int i = 0; i < reviews.size(); i++) {
             listOfReviews.add(new Review(reviews.get(i), authors.get(i)));
         }
         return listOfReviews;

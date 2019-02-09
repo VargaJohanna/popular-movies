@@ -11,24 +11,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.movies.popularmoviesjava.R;
 import com.movies.popularmoviesjava.adapter.ReviewAdapter;
 import com.movies.popularmoviesjava.adapter.TrailerAdapter;
-import com.movies.popularmoviesjava.databinding.ActivityDetailBinding;
-import com.movies.popularmoviesjava.model.Review;
-import com.movies.popularmoviesjava.viewmodels.DetailsViewModel;
 import com.movies.popularmoviesjava.database.MovieEntry;
+import com.movies.popularmoviesjava.databinding.ActivityDetailBinding;
 import com.movies.popularmoviesjava.model.Movie;
+import com.movies.popularmoviesjava.model.Review;
 import com.movies.popularmoviesjava.model.TrailerVideo;
 import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.network.RetrofitInstance;
 import com.movies.popularmoviesjava.utilities.ImageSize;
 import com.movies.popularmoviesjava.utilities.TrailerUrl;
+import com.movies.popularmoviesjava.viewmodels.DetailsViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -96,7 +93,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     public void setReviewList(List<Review> reviewObjects) {
-        for(Review review : reviewObjects) {
+        for (Review review : reviewObjects) {
             this.reviewList.add(review.getReviewContent().trim());
         }
     }
@@ -106,7 +103,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     public void setReviewAuthorsList(List<Review> reviewObjects) {
-        for(Review review : reviewObjects) {
+        for (Review review : reviewObjects) {
             this.reviewAuthorsList.add(review.getReviewAuthor().trim());
         }
     }
@@ -116,12 +113,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         viewModel.getTrailerVideoListFromApi().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
             @Override
             public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
-                if(trailerVideos != null) {
+                if (trailerVideos != null) {
                     generateTrailerList(trailerVideos);
                     mBinding.recyclerViewTrailer.setVisibility(View.VISIBLE);
                     setTrailerTitles(trailerVideos);
                     setTrailerKeys(trailerVideos);
-                } else if(mIsFavourite) {
+                } else if (mIsFavourite) {
                     viewModel.getVideoListFromDb().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
                         @Override
                         public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
@@ -212,16 +209,16 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         viewModel.getReviewsListFromApi().observe(this, new Observer<List<Review>>() {
             @Override
             public void onChanged(@Nullable List<Review> reviews) {
-                if(reviews != null) {
+                if (reviews != null) {
                     generateReviewList(reviews);
                     mBinding.recyclerViewReviews.setVisibility(View.VISIBLE);
                     setReviewList(reviews);
                     setReviewAuthorsList(reviews);
-                } else if(mIsFavourite) {
+                } else if (mIsFavourite) {
                     viewModel.getReviewsListFromDb().observe(DetailActivity.this, new Observer<List<Review>>() {
                         @Override
                         public void onChanged(@Nullable List<Review> reviews) {
-                            if(reviews.size() != 0) {
+                            if (reviews.size() != 0) {
                                 generateReviewList(reviews);
                                 mBinding.recyclerViewReviews.setVisibility(View.VISIBLE);
                             } else {
@@ -231,8 +228,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                         }
                     });
                     viewModel.fetchReviewListFromDb(movie.getFilmId());
-                }
-                else {
+                } else {
                     mBinding.reviewListTitle.setVisibility(View.INVISIBLE);
                     mBinding.recyclerViewReviews.setVisibility(View.INVISIBLE);
                 }

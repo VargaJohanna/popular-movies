@@ -14,6 +14,7 @@ import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
     private List<Review> reviewList;
+
     public ReviewAdapter(List<Review> reviewList) {
         this.reviewList = reviewList;
     }
@@ -37,7 +38,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
         return reviewList.size();
     }
 
-    public class ReviewAdapterViewHolder extends  RecyclerView.ViewHolder {
+    public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder {
         final TextView reviewText;
         final TextView reviewAuthor;
 

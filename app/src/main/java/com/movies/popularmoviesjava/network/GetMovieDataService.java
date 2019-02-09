@@ -11,14 +11,14 @@ import retrofit2.http.Query;
 
 public interface GetMovieDataService {
     @GET("/3/movie/{sort_by}")
-    Call<MovieList> getMovieData(@Path("sort_by")String sortBy,
-                                 @Query("api_key")String apiKey);
+    Call<MovieList> getMovieData(@Path("sort_by") String sortBy,
+                                 @Query("api_key") String apiKey);
 
     @GET("/3/movie/{video_id}/videos")
-    Call<TrailersList> getTrailerList(@Path("video_id")String videoId,
-                                      @Query("api_key")String apiKey);
+    Call<TrailersList> getTrailerList(@Path("video_id") String videoId,
+                                      @Query("api_key") String apiKey);
 
     @GET("/3/movie/{video_id}/reviews")
-    Call<ReviewsList> getReviewList(@Path("video_id")String videoId,
-                                    @Query("api_key")String apiKey);
+    Call<ReviewsList> getReviewList(@Path("video_id") String videoId,
+                                    @Query("api_key") String apiKey);
 }
