@@ -26,7 +26,7 @@ import retrofit2.Response;
 
 public class DetailsViewModel extends AndroidViewModel {
     private MutableLiveData<List<TrailerVideo>> videoListFromDb;
-    private MutableLiveData<Boolean> isFavourite;
+        private MutableLiveData<Boolean> isFavourite;
     private MutableLiveData<List<TrailerVideo>> trailerVideoListFromApi;
     private MutableLiveData<List<Review>> reviewsListFromApi;
     private MutableLiveData<List<Review>> reviewsListFromDb;

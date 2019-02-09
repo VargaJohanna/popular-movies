@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Popular Movies Java</string>
+    <string name="app_name">Popular Movies</string>
     <string name="most_popular">Most Popular</string>
     <string name="top_rated_menu">Top Rated</string>
     <string name="movie_title">Movie Title</string>
@@ -10,9 +10,9 @@
     <string name="rating_label">Rating:</string>
     <string name="popular_sort_by">popular</string>
     <string name="top_rated_sort_by">top_rated</string>
+    <string name="favourite_sort_by">favourites</string>
     <string name="trailers_list_title">Trailers:</string>
     <string name="placeholder_trailer_title">Trailer</string>
-    <string name="my_favourites_menu">My Favourites</string>
     <string name="most_popular_title">Most Popular Movies</string>
     <string name="top_rated_movies_title">Top Rated Movies</string>
     <string name="my_favourites_title">My Favourites</string>

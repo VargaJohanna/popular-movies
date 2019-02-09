@@ -14,6 +14,7 @@ import com.movies.popularmoviesjava.network.GetMovieDataService;
 import com.movies.popularmoviesjava.utilities.ApiKey;
 import com.movies.popularmoviesjava.utilities.AppExecutors;
 
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -23,6 +24,7 @@ import retrofit2.Response;
 public class MainViewModel extends AndroidViewModel {
     private MutableLiveData<List<Movie>> movieListFromApi;
     private LiveData<List<MovieEntry>> favouriteMovies;
+    private MutableLiveData<String> sortBy;
 
 
     public MainViewModel(@NonNull Application application) {
@@ -30,6 +32,7 @@ public class MainViewModel extends AndroidViewModel {
         this.movieListFromApi = new MutableLiveData<>();
         AppDatabase database = AppDatabase.getInstance(this.getApplication());
         favouriteMovies = database.movieDao().loadAllFavouriteMovies();
+        this.sortBy = new MutableLiveData<>();
     }
 
     public LiveData<List<Movie>> getMovieListFromApi() {
@@ -50,7 +53,7 @@ public class MainViewModel extends AndroidViewModel {
 
                     @Override
                     public void onFailure(Call<MovieList> call, Throwable t) {
-                        movieListFromApi.postValue(null);
+                        movieListFromApi.postValue(Collections.<Movie>emptyList());
                     }
                 });
             }
@@ -59,6 +62,14 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<List<MovieEntry>> getFavouriteMovies() {
         return favouriteMovies;
+    }
+
+    public LiveData<String> getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy.setValue(sortBy);
     }
 
 }

@@ -59,16 +59,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         viewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
         service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
         observeFavouriteState();
-
         if (intent.hasExtra(MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
             setupUI();
             viewModel.fetchMovieInFavourites(movie.getFilmId());
             observeTrailerList();
+            observeReviewList();
         }
         movieEntry = getMovieEntry();
         addListenerToFavouriteButton();
-        observeReviewList();
         setTitle(movie.getTitle());
     }
 
@@ -113,6 +112,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private void observeTrailerList() {
+        mBinding.progressBarDetails.setVisibility(View.VISIBLE);
         viewModel.getTrailerVideoListFromApi().observe(DetailActivity.this, new Observer<List<TrailerVideo>>() {
             @Override
             public void onChanged(@Nullable List<TrailerVideo> trailerVideos) {
@@ -147,6 +147,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private void setupUI() {
+        mBinding.progressBarDetails.setVisibility(View.VISIBLE);
         Picasso.get()
                 .load(RetrofitInstance.IMAGE_BASE_URL + ImageSize.getImageSize(4) + movie.getPosterPath())
                 .placeholder(R.drawable.ic_launcher_background)
@@ -155,6 +156,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         mBinding.synopsis.setText(movie.getSynopsis());
         mBinding.userRating.setText(String.format("%s %s", getString(R.string.rating_label), movie.getUserRating()));
         mBinding.releaseDate.setText(String.format("%s %s", getString(R.string.released_label), movie.getReleaseDate()));
+        mBinding.progressBarDetails.setVisibility(View.INVISIBLE);
     }
 
     private String getTrailerId(TrailerVideo video) {
@@ -206,6 +208,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private void observeReviewList() {
+        mBinding.progressBarDetails.setVisibility(View.VISIBLE);
         viewModel.getReviewsListFromApi().observe(this, new Observer<List<Review>>() {
             @Override
             public void onChanged(@Nullable List<Review> reviews) {
@@ -233,6 +236,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     mBinding.reviewListTitle.setVisibility(View.INVISIBLE);
                     mBinding.recyclerViewReviews.setVisibility(View.INVISIBLE);
                 }
+                mBinding.progressBarDetails.setVisibility(View.INVISIBLE);
             }
         });
         viewModel.fetchReviewsFromApi(service, movie.getFilmId());
