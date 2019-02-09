@@ -34,7 +34,7 @@ import java.util.List;
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener {
     ActivityDetailBinding mBinding;
     public static final String MOVIE_OBJECT = "movie";
-    Intent intent;
+    private Intent intent;
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
     private Movie movie;
@@ -128,7 +128,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     });
                     viewModel.fetchVideoListFromDb(movie.getFilmId());
                 } else {
-                    Toast.makeText(DetailActivity.this, "Something went wrong. We couldn't fetch trailers...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DetailActivity.this, R.string.error_message_toast, Toast.LENGTH_SHORT).show();
                 }
                 mBinding.progressBarDetails.setVisibility(View.INVISIBLE);
             }

@@ -17,7 +17,10 @@
                 android:id="@+id/favourite_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                style="@style/ImageViewStyle"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
                 android:src="@drawable/ic_five_pointed_star"
                 app:layout_constraintStart_toStartOf="@+id/release_date"
                 app:layout_constraintTop_toBottomOf="@+id/user_rating" />
@@ -26,64 +29,90 @@
                 android:id="@+id/thumbnail_image"
                 android:layout_width="155dp"
                 android:layout_height="195dp"
-                style="@style/ImageViewStyle"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
                 android:src="@drawable/tape"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/release_date"
-                style="@style/TextViewMargins"
                 android:text="@string/release_date_placeholder"
                 app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/TextViewMargins"/>
 
             <TextView
                 android:id="@+id/user_rating"
-                style="@style/TextViewStyle"
                 android:text="@string/user_rating_placeholder"
                 app:layout_constraintStart_toStartOf="@+id/release_date"
-                app:layout_constraintTop_toBottomOf="@+id/release_date" />
+                app:layout_constraintTop_toBottomOf="@+id/release_date"
+                style="@style/TextViewStyle"/>
 
             <TextView
                 android:id="@+id/synopsis"
-                style="@style/SynopsisTextStyle"
                 android:text="@string/placeholder"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/thumbnail_image" />
+                app:layout_constraintTop_toBottomOf="@+id/thumbnail_image"
+                style="@style/TextViewMargins"/>
+
 
             <TextView
                 android:id="@+id/trailer_list_title"
-                style="@style/TextAboveRecyclerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:text="@string/trailers_list_title"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/synopsis" />
+                app:layout_constraintTop_toBottomOf="@+id/synopsis"
+                android:layout_marginStart="16dp" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_trailer"
-                style="@style/RecyclerViewStyle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/trailer_list_title"/>
+                android:nestedScrollingEnabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:layout_constraintStart_toStartOf="@+id/trailer_list_title"
+                app:layout_constraintTop_toBottomOf="@+id/trailer_list_title" />
 
             <TextView
                 android:id="@+id/review_list_title"
-                style="@style/TextAboveRecyclerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/reviews_list_title"
-                app:layout_constraintStart_toStartOf="parent"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="@+id/trailer_list_title"
                 app:layout_constraintTop_toBottomOf="@+id/recycler_view_trailer" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_reviews"
-                style="@style/RecyclerViewStyle"
+                android:nestedScrollingEnabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:paddingBottom="16dp"
                 app:layout_constraintStart_toStartOf="@+id/trailer_list_title"
-                app:layout_constraintTop_toBottomOf="@+id/review_list_title"/>
+                app:layout_constraintTop_toBottomOf="@+id/review_list_title" />
 
             <ProgressBar
                 android:id="@+id/progress_bar_details"
-                style="@style/ProgressBarStyle"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="164dp"
+                android:layout_marginLeft="164dp"
+                android:layout_marginTop="208dp"
+                android:foregroundGravity="center"
+                android:visibility="invisible"
+                app:layout_constraintVertical_bias="0.507"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
