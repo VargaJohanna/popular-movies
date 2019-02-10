@@ -15,17 +15,17 @@
 
             <ImageView
                 android:id="@+id/favourite_icon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/favourite_icon_size"
+                android:layout_height="@dimen/favourite_icon_size"
                 style="@style/ImageViewStyle"
                 android:src="@drawable/ic_five_pointed_star"
-                app:layout_constraintStart_toStartOf="@+id/release_date"
+                app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
                 app:layout_constraintTop_toBottomOf="@+id/user_rating" />
 
             <ImageView
                 android:id="@+id/thumbnail_image"
-                android:layout_width="155dp"
-                android:layout_height="195dp"
+                android:layout_width="@dimen/thumbnail_image_width"
+                android:layout_height="@dimen/thumbnail_image_height"
                 style="@style/ImageViewStyle"
                 android:src="@drawable/tape"
                 app:layout_constraintStart_toStartOf="parent"
@@ -42,11 +42,13 @@
 
             <TextView
                 android:id="@+id/user_rating"
-                android:layout_height="wrap_content"
+                style="@style/TextViewStyleBold"
                 android:layout_width="wrap_content"
-                style="@style/TextViewStyle"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:text="@string/user_rating_placeholder"
-                app:layout_constraintStart_toStartOf="@+id/release_date"
+                app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
                 app:layout_constraintTop_toBottomOf="@+id/release_date" />
 
             <TextView

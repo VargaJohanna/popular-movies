@@ -128,7 +128,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     });
                     viewModel.fetchVideoListFromDb(movie.getFilmId());
                 } else {
-                    Toast.makeText(DetailActivity.this, R.string.error_message_toast, Toast.LENGTH_SHORT).show();
+                    mBinding.trailerListTitle.setVisibility(View.INVISIBLE);
+                    mBinding.recyclerViewTrailer.setVisibility(View.INVISIBLE);
+                    Toast.makeText(DetailActivity.this, R.string.no_internet_message, Toast.LENGTH_SHORT).show();
                 }
                 mBinding.progressBarDetails.setVisibility(View.INVISIBLE);
             }

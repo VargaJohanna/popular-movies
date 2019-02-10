@@ -21,7 +21,6 @@
     <string name="author_label">From:</string>
     <string name="author_name_placeholder">author name</string>
     <string name="review_placeholder">review</string>
-    <string name="error_message_toast">Something went wrong. We couldn\'t fetch trailers...</string>
     <string name="screen_small">small</string>
     <string name="screen_normal">normal</string>
     <string name="screen_large">large</string>

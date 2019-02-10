@@ -7,5 +7,8 @@
     <dimen name="margin_small">8dp</dimen>
     <dimen name="padding_large">16dp</dimen>
     <integer name="main_columns">2</integer>
+    <dimen name="favourite_icon_size">30dp</dimen>
+    <dimen name="thumbnail_image_width">155dp</dimen>
+    <dimen name="thumbnail_image_height">195dp</dimen>
 
 </resources>
