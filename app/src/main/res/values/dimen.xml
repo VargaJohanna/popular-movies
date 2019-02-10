@@ -2,4 +2,5 @@
 <resources>
     <dimen name="text_size_16">16sp</dimen>
     <dimen name="text_size_20">20sp</dimen>
+    <integer name="main_columns">2</integer>
 </resources>
