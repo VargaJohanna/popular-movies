@@ -33,13 +33,17 @@
 
             <TextView
                 android:id="@+id/release_date"
-                style="@style/TextViewMargins"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                style="@style/TextViewStyleBold"
                 android:text="@string/release_date_placeholder"
                 app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/user_rating"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 style="@style/TextViewStyle"
                 android:text="@string/user_rating_placeholder"
                 app:layout_constraintStart_toStartOf="@+id/release_date"
@@ -47,7 +51,9 @@
 
             <TextView
                 android:id="@+id/synopsis"
-                style="@style/SynopsisTextStyle"
+                style="@style/TextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/placeholder"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,6 +61,8 @@
 
             <TextView
                 android:id="@+id/trailer_list_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/TextAboveRecyclerView"
                 android:text="@string/trailers_list_title"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,12 +70,16 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_trailer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/RecyclerViewStyle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trailer_list_title"/>
 
             <TextView
                 android:id="@+id/review_list_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/TextAboveRecyclerView"
                 android:text="@string/reviews_list_title"
                 app:layout_constraintStart_toStartOf="parent"
@@ -75,12 +87,16 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/RecyclerViewStyle"
                 app:layout_constraintStart_toStartOf="@+id/trailer_list_title"
                 app:layout_constraintTop_toBottomOf="@+id/review_list_title"/>
 
             <ProgressBar
                 android:id="@+id/progress_bar_details"
+                android:layout_width="@dimen/progressbar_size"
+                android:layout_height="@dimen/progressbar_size"
                 style="@style/ProgressBarStyle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
