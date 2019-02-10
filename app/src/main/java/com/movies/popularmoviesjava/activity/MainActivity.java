@@ -3,6 +3,7 @@ package com.movies.popularmoviesjava.activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private MovieAdapter mainAdapter;
     private MainViewModel viewModel;
     private GetMovieDataService service = RetrofitInstance.getInstance().create(GetMovieDataService.class);
+    String screenSizeCategory;
+    String screenOrientation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             viewModel.setSortBy(getString(R.string.popular_sort_by));
         }
         observeMovieList();
+        screenSizeCategory = getScreenSizeCategory();
+        screenOrientation = getScreenOrientation();
         generateMovieList(mainAdapter);
         setTitle(R.string.most_popular_title);
     }
@@ -107,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     private void generateMovieList(RecyclerView.Adapter adapter) {
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this, getSpanCount());
         mBinding.recyclerView.setLayoutManager(layoutManager);
         mBinding.recyclerView.setAdapter(adapter);
     }
@@ -149,5 +154,49 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         Intent detailActivity = new Intent(this, DetailActivity.class);
         detailActivity.putExtra(DetailActivity.MOVIE_OBJECT, movie);
         startActivity(detailActivity);
+    }
+
+    private String getScreenSizeCategory() {
+        int screenLayout = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        switch (screenLayout) {
+            case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                // small screens are at least 426dp x 320dp
+                return getString(R.string.screen_small);
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                // normal screens are at least 470dp x 320dp
+                return getString(R.string.screen_normal);
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                // large screens are at least 640dp x 480dp
+                return getString(R.string.screen_large);
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                // xlarge screens are at least 960dp x 720dp
+                return getString(R.string.screen_xlarge);
+            default:
+                return getString(R.string.undefined);
+        }
+    }
+
+    private String getScreenOrientation() {
+        String orientation = getString(R.string.undefined);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            orientation = getString(R.string.screen_landscape);
+        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            orientation = getString(R.string.screen_portrait);
+        }
+
+        return orientation;
+    }
+
+    private int getSpanCount() {
+        if (screenSizeCategory.equals(getString(R.string.screen_small))) {
+            return 2;
+        } else if (screenOrientation.equals(getString(R.string.screen_portrait))
+                && screenSizeCategory.equals(getString(R.string.screen_normal))) {
+            return 2;
+        } else {
+            return 3;
+        }
     }
 }
